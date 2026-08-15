@@ -8,18 +8,30 @@ import { isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Dominio que se codifica en el QR, del mas explicito al mas adivinado.
+ *
+ * El host del request va ANTES de la variable de Vercel a proposito: si el
+ * proyecto tiene dominio propio, `VERCEL_PROJECT_PRODUCTION_URL` igual devuelve
+ * el `.vercel.app`, y el papel de la butaca terminaria con la URL fea (o con
+ * una que dejo de funcionar si algun dia se suelta ese subdominio).
+ */
 async function siteUrl(override?: string): Promise<string> {
   if (override?.startsWith("http")) return override;
 
-  // En Vercel esta variable ya trae el dominio de produccion; en local caemos
-  // al host del request para que el QR sirva desde el celular en la misma red.
+  const configured = process.env.NEXT_PUBLIC_SITE_URL;
+  if (configured?.startsWith("http")) return configured.replace(/\/+$/, "");
+
+  const host = (await headers()).get("host");
+  if (host) {
+    const proto = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
+    return `${proto}://${host}`;
+  }
+
   const production = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (production) return `https://${production}`;
 
-  const h = await headers();
-  const host = h.get("host") ?? "localhost:3000";
-  const proto = host.startsWith("localhost") ? "http" : "https";
-  return `${proto}://${host}`;
+  return "http://localhost:3000";
 }
 
 export default async function QrPage({

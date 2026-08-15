@@ -69,10 +69,20 @@ Importar el repo y cargar las variables de entorno de `.env.example`:
 | `AUTH_SECRET` | `openssl rand -hex 32` |
 | `NEXT_PUBLIC_DEFAULT_VOTE_UI` | `swipe`, `grid` o `stack` |
 
+Las variables `NEXT_PUBLIC_*` se hornean en el build: si cambiás alguna, hay que
+redeployar para que tome efecto. Las otras se leen en cada request.
+
 ### 3. Los QR
 
 `/admin/qr` genera el código y una hoja lista para imprimir y recortar
 (corrección de errores alta, que aguanta el papel doblado en una butaca).
+
+El QR apunta al dominio con el que estés navegando el panel, así que **generalo
+desde el dominio definitivo**. Si vas a usar un dominio propio, agregalo en
+Vercel *antes* de imprimir: `VERCEL_PROJECT_PRODUCTION_URL` siempre devuelve el
+`.vercel.app`, y el papel de la butaca quedaría con la URL fea. Para forzar un
+dominio concreto está `NEXT_PUBLIC_SITE_URL`, o el parámetro `?url=` de la
+página.
 
 ---
 
