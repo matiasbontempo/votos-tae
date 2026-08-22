@@ -66,6 +66,18 @@ La variante por defecto se fija con `NEXT_PUBLIC_DEFAULT_VOTE_UI`.
 1. Crear un proyecto en <https://supabase.com> (plan free).
 2. **SQL Editor → New query**: pegar todo `supabase/schema.sql` y ejecutar.
    Es idempotente: se puede volver a correr cuando quieras.
+
+   **Si el proyecto de Supabase ya existía** (venías de la versión de cuatro
+   personajes), esto es todo lo que hay que hacer antes de deployar: volvé a
+   pegar `schema.sql` entero y ejecutalo. La sección 8 del archivo pone al día
+   lo que `create ... if not exists` no toca — el default `hidden`, la
+   visibilidad de una función creada y todavía sin abrir, y las filas de conteo
+   de los sospechosos nuevos. Una función *abierta* conserva la visibilidad que
+   tenía: si querés taparle los conteos, cambialo desde el panel.
+
+   Los placeholders `a`..`d` se borran solos salvo que tengan votos. Si te
+   quedaron votos de ensayo encima, borralos («Borrar todos los votos» en el
+   panel, o finalizá esa función) y volvé a correr el archivo.
 3. Los siete sospechosos ya están cargados al final de `schema.sql`, en el
    `insert into public.options`. Ese insert es un upsert: si volvés a correr el
    archivo, pisa nombre, bajada, párrafo, color y orden con lo que diga el

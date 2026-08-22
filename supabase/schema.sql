@@ -247,3 +247,33 @@ on conflict (id) do update set
 delete from public.options o
  where o.id in ('a', 'b', 'c', 'd')
    and not exists (select 1 from public.votes v where v.option_id = o.id);
+
+-- ---------------------------------------------------------------------------
+-- 8. Puesta al dia de una base que ya existia
+-- ---------------------------------------------------------------------------
+-- Todo lo de arriba es `create ... if not exists`, asi que sobre un proyecto ya
+-- provisionado no toca las tablas que ya estaban. Estas tres cosas si hay que
+-- forzarlas para que una base vieja quede igual que una recien creada.
+
+-- El default nuevo: nadie ve los votos ajenos mientras se vota. `create table
+-- if not exists` no lo aplica sobre una tabla que ya existe.
+alter table public.shows
+  alter column results_visibility set default 'hidden';
+
+-- Una funcion que todavia no abrio conserva la visibilidad con la que se creo.
+-- La pasamos al default nuevo: nadie voto todavia, asi que no le cambia las
+-- reglas a nadie a mitad de camino. Una funcion abierta o cerrada se deja como
+-- esta; si hace falta, se cambia desde el panel.
+update public.shows
+   set results_visibility = 'hidden'
+ where status = 'idle'
+   and results_visibility <> 'hidden';
+
+-- Las filas de conteo se siembran con un trigger al CREAR la funcion, asi que
+-- una funcion que ya existia no tiene fila para los sospechosos nuevos. Sin
+-- esto, el panel no los lista hasta que alguien los vota.
+insert into public.tallies (show_id, option_id, count)
+select s.id, o.id, 0
+  from public.shows s
+ cross join public.options o
+on conflict do nothing;
