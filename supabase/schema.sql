@@ -6,10 +6,10 @@
 -- ===========================================================================
 
 -- ---------------------------------------------------------------------------
--- 1. Opciones (los 4 finales). Son siempre las mismas en todas las funciones.
+-- 1. Opciones (los sospechosos). Son siempre las mismas en todas las funciones.
 -- ---------------------------------------------------------------------------
 create table if not exists public.options (
-  id          text primary key,          -- slug corto y estable: 'a', 'vera', ...
+  id          text primary key,          -- slug corto y estable: 'noah', 'maid', ...
   name        text not null,             -- nombre del personaje / final
   subtitle    text,                      -- bajada corta, se ve en la tarjeta
   blurb       text,                      -- parrafo de acusacion (variantes swipe/stack)
@@ -30,13 +30,14 @@ create table if not exists public.options (
 -- results_visibility (que ve el PUBLICO mientras la votacion esta abierta):
 --   live       -> barras en vivo desde el primer voto
 --   after_vote -> ve los conteos recien despues de emitir su voto
---   hidden     -> no ve conteos hasta que el admin cierra la votacion
+--   hidden     -> no ve conteos hasta que el admin cierra la votacion (default:
+--                 nadie puede ver los votos ajenos mientras se vota)
 create table if not exists public.shows (
   id                 uuid primary key default gen_random_uuid(),
   name               text not null,
   status             text not null default 'idle'
                        check (status in ('idle', 'open', 'closed', 'finished')),
-  results_visibility text not null default 'after_vote'
+  results_visibility text not null default 'hidden'
                        check (results_visibility in ('live', 'after_vote', 'hidden')),
   winner_option_id   text references public.options (id) on delete set null,
   created_at         timestamptz not null default now(),
@@ -86,7 +87,7 @@ create table if not exists public.tallies (
 );
 
 -- Al crear una funcion, arrancar todas las opciones en 0 para que el publico
--- vea las 4 barras desde el minuto cero.
+-- vea todas las barras desde el minuto cero.
 create or replace function public.seed_tallies()
 returns trigger
 language plpgsql
@@ -215,14 +216,34 @@ end
 $$;
 
 -- ---------------------------------------------------------------------------
--- 7. Las 4 opciones
+-- 7. Los sospechosos de "Asesinato en la Mansion Greenstout"
 -- ---------------------------------------------------------------------------
--- >>> EDITAR ACA con los personajes reales de la obra. <<<
--- Cambiar name/subtitle/blurb/color libremente. Los `id` conviene dejarlos
--- fijos una vez que hubo funciones reales, porque los votos los referencian.
+-- Los `blurb` son de relleno: cambiarlos por el texto real de la obra. Los `id`
+-- conviene dejarlos fijos una vez que hubo funciones reales, porque los votos
+-- los referencian.
+--
+-- El upsert pisa name/subtitle/blurb/color/sort_order en cada corrida, asi que
+-- este archivo es la fuente de verdad: si editas un personaje desde el Table
+-- Editor y despues volves a correr el schema, gana lo que dice aca. `image_url`
+-- queda afuera a proposito, para no borrar las fotos subidas a Storage.
 insert into public.options (id, name, subtitle, blurb, color, sort_order) values
-  ('a', 'Personaje A', 'La heredera',      'Tenia el motivo mas antiguo de todos: el dinero que nunca le tocó.',        '#e11d48', 1),
-  ('b', 'Personaje B', 'El socio',         'Sabia exactamente cuanto valia ese silencio, y cuanto costaba romperlo.',   '#f59e0b', 2),
-  ('c', 'Personaje C', 'La institutriz',   'Nadie mira a quien sirve el te. Ella conto con eso toda la noche.',         '#10b981', 3),
-  ('d', 'Personaje D', 'El inspector',     'Llego demasiado rapido para alguien a quien nadie habia llamado todavia.',  '#3b82f6', 4)
-on conflict (id) do nothing;
+  ('noah',     'Noah Davies',        'Detective',             'Llego a la mansion antes de que nadie lo llamara, y conoce cada pasillo demasiado bien.',       '#3b82f6', 1),
+  ('maid',     'Lady Maid',          'Ama de llaves',         'Tiene la llave de todas las puertas y escucho todas las conversaciones.',                      '#10b981', 2),
+  ('liam',     'Liam Jones',         'Mano derecha de Emily', 'Manejaba cada negocio, cada deuda y cada secreto de Emily. Ser imprescindible tambien es un motivo.', '#f59e0b', 3),
+  ('james',    'James Smith',        '2do esposo de Emily',   'Entro a la familia por la puerta grande y todavia lo miran como a un extrano.',                '#8b5cf6', 4),
+  ('mary',     'Mary Caissings',     'Esposa de John',        'Se caso con el apellido y aprendio a soportar lo que venia con el. Esa noche dejo de sonreir.', '#e11d48', 5),
+  ('cinthia',  'Cinthia Murdoch',    'Protegida de Emily',    'Emily la levanto de la nada y la sento en una mesa donde nadie la queria.',                     '#22d3ee', 6),
+  ('lawrence', 'Lawrence Caissings', 'Hijo menor de Emily',   'Siempre segundo, siempre despues. Espero su turno toda la vida.',                              '#f472b6', 7)
+on conflict (id) do update set
+  name       = excluded.name,
+  subtitle   = excluded.subtitle,
+  blurb      = excluded.blurb,
+  color      = excluded.color,
+  sort_order = excluded.sort_order;
+
+-- Los placeholders 'a'..'d' de la version anterior del esquema. Se van solos si
+-- nunca los voto nadie; si alguna funcion vieja los tiene, se quedan (borrarlos
+-- se llevaria esos votos por cascade).
+delete from public.options o
+ where o.id in ('a', 'b', 'c', 'd')
+   and not exists (select 1 from public.votes v where v.option_id = o.id);

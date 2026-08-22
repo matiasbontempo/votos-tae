@@ -12,15 +12,19 @@ begin
 end $$;
 
 -- ===========================================================================
--- 1. Crear funcion siembra las 4 opciones en 0
+-- 1. Crear funcion siembra las 7 opciones en 0
 -- ===========================================================================
 insert into shows (id, name) values
   ('11111111-1111-1111-1111-111111111111', 'Test 1');
 
 select check_eq('tallies sembradas', (select count(*)::int from tallies
-  where show_id='11111111-1111-1111-1111-111111111111'), 4);
+  where show_id='11111111-1111-1111-1111-111111111111'), 7);
 select check_eq('arrancan en cero', (select sum(count)::int from tallies
   where show_id='11111111-1111-1111-1111-111111111111'), 0);
+
+-- Por defecto nadie ve los votos ajenos mientras la votacion esta abierta.
+select check_eq('visibilidad por defecto', (select results_visibility from shows
+  where id='11111111-1111-1111-1111-111111111111'), 'hidden');
 
 -- ===========================================================================
 -- 2. Una sola funcion viva a la vez
@@ -39,16 +43,16 @@ end $$;
 update shows set status='open' where id='11111111-1111-1111-1111-111111111111';
 
 insert into votes (show_id, option_id, device_id) values
-  ('11111111-1111-1111-1111-111111111111','a','dev-1'),
-  ('11111111-1111-1111-1111-111111111111','a','dev-2'),
-  ('11111111-1111-1111-1111-111111111111','b','dev-3');
+  ('11111111-1111-1111-1111-111111111111','noah','dev-1'),
+  ('11111111-1111-1111-1111-111111111111','noah','dev-2'),
+  ('11111111-1111-1111-1111-111111111111','maid','dev-3');
 
-select check_eq('conteo opcion a', (select count from tallies
-  where show_id='11111111-1111-1111-1111-111111111111' and option_id='a'), 2);
-select check_eq('conteo opcion b', (select count from tallies
-  where show_id='11111111-1111-1111-1111-111111111111' and option_id='b'), 1);
-select check_eq('conteo opcion c', (select count from tallies
-  where show_id='11111111-1111-1111-1111-111111111111' and option_id='c'), 0);
+select check_eq('conteo noah', (select count from tallies
+  where show_id='11111111-1111-1111-1111-111111111111' and option_id='noah'), 2);
+select check_eq('conteo maid', (select count from tallies
+  where show_id='11111111-1111-1111-1111-111111111111' and option_id='maid'), 1);
+select check_eq('conteo liam', (select count from tallies
+  where show_id='11111111-1111-1111-1111-111111111111' and option_id='liam'), 0);
 
 -- ===========================================================================
 -- 4. Un voto por dispositivo por funcion
@@ -56,7 +60,7 @@ select check_eq('conteo opcion c', (select count from tallies
 do $$
 begin
   insert into votes (show_id, option_id, device_id)
-    values ('11111111-1111-1111-1111-111111111111','c','dev-1');
+    values ('11111111-1111-1111-1111-111111111111','liam','dev-1');
   raise exception 'FAIL  se permitio doble voto del mismo dispositivo';
 exception when unique_violation then
   raise notice 'PASS  doble voto rechazado';
@@ -76,7 +80,7 @@ select check_eq('reset deja todo en cero', (select sum(count)::int from tallies
 -- 6. RLS sobre tallies segun visibilidad
 -- ===========================================================================
 insert into votes (show_id, option_id, device_id)
-  values ('11111111-1111-1111-1111-111111111111','a','dev-9');
+  values ('11111111-1111-1111-1111-111111111111','noah','dev-9');
 
 -- hidden -> el publico no ve nada
 update shows set status='open', results_visibility='hidden'
@@ -89,21 +93,21 @@ reset role;
 update shows set results_visibility='live'
   where id='11111111-1111-1111-1111-111111111111';
 set role anon;
-select check_eq('anon ve tallies en live', (select count(*)::int from tallies), 4);
+select check_eq('anon ve tallies en live', (select count(*)::int from tallies), 7);
 reset role;
 
 -- after_vote -> legible (documentado como barrera de UI, no criptografica)
 update shows set results_visibility='after_vote'
   where id='11111111-1111-1111-1111-111111111111';
 set role anon;
-select check_eq('anon ve tallies en after_vote', (select count(*)::int from tallies), 4);
+select check_eq('anon ve tallies en after_vote', (select count(*)::int from tallies), 7);
 reset role;
 
 -- cerrada -> siempre visible, aunque estuviera en hidden
 update shows set status='closed', results_visibility='hidden'
   where id='11111111-1111-1111-1111-111111111111';
 set role anon;
-select check_eq('anon ve tallies al cerrar', (select count(*)::int from tallies), 4);
+select check_eq('anon ve tallies al cerrar', (select count(*)::int from tallies), 7);
 
 -- ===========================================================================
 -- 7. anon nunca ve votos individuales
@@ -119,13 +123,13 @@ end $$;
 do $$
 begin
   insert into votes (show_id, option_id, device_id)
-    values ('11111111-1111-1111-1111-111111111111','d','hacker');
+    values ('11111111-1111-1111-1111-111111111111','james','hacker');
   raise exception 'FAIL  anon pudo insertar un voto';
 exception when insufficient_privilege then
   raise notice 'PASS  anon no puede insertar votos';
 end $$;
 
-select check_eq('anon ve las opciones', (select count(*)::int from options), 4);
+select check_eq('anon ve las opciones', (select count(*)::int from options), 7);
 select check_eq('anon ve la funcion', (select count(*)::int from shows), 1);
 reset role;
 

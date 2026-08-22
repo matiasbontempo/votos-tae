@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ResultsBars } from "@/components/vote/ResultsBars";
 import { Silhouette } from "@/components/vote/Silhouette";
+import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import { GridVariant } from "@/components/vote/variants/GridVariant";
 import { StackVariant } from "@/components/vote/variants/StackVariant";
 import { SwipeVariant } from "@/components/vote/variants/SwipeVariant";
@@ -174,7 +175,6 @@ export function VoteApp({
   if (!show || show.status === "finished") {
     return (
       <Screen
-        eyebrow="El veredicto"
         title="Todavía no"
         body="Cuando llegue el momento, esta pantalla se va a despertar sola. Dejala abierta."
       />
@@ -184,7 +184,6 @@ export function VoteApp({
   if (show.status === "idle") {
     return (
       <Screen
-        eyebrow={show.name}
         title="Falta poco"
         body="La votación no abrió todavía. No cierres esta pantalla: se actualiza sola."
         pulse
@@ -196,7 +195,6 @@ export function VoteApp({
     const winner = pickWinner(state);
     return (
       <Screen
-        eyebrow={show.name}
         title={winner ? `El jurado eligió a ${winner.name}` : "Votación cerrada"}
         body={
           winner
@@ -228,7 +226,6 @@ export function VoteApp({
     const voted = options.find((o) => o.id === myVote);
     return (
       <Screen
-        eyebrow={show.name}
         title="Tu acusación quedó registrada"
         body={
           voted
@@ -313,13 +310,11 @@ function pickWinner(state: PublicState) {
 }
 
 function Screen({
-  eyebrow,
   title,
   body,
   pulse = false,
   children,
 }: {
-  eyebrow: string;
   title: string;
   body?: string;
   pulse?: boolean;
@@ -328,9 +323,7 @@ function Screen({
   return (
     <main className="stage-bg flex min-h-screen-safe flex-col items-center justify-center px-6 py-12">
       <div className="animate-rise w-full max-w-md text-center">
-        <p className="text-brass text-[11px] font-semibold tracking-[0.25em] uppercase">
-          {eyebrow}
-        </p>
+        <TitleEyebrow />
 
         <h1 className="font-display mt-3 text-3xl leading-tight text-balance">
           {title}

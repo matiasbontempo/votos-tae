@@ -4,8 +4,8 @@ import type { VoteOption } from "@/lib/types";
  * Marcador de posicion para la foto recortada del actor.
  *
  * Cuando existan los PNG con fondo transparente se cargan en
- * `options.image_url` y este componente los usa en lugar del dibujo. Las cuatro
- * siluetas son distintas entre si a proposito: sirven para juzgar si la
+ * `options.image_url` y este componente los usa en lugar del dibujo. Hay una
+ * silueta distinta por sospechoso a proposito: sirven para juzgar si la
  * pantalla se lee de un vistazo, que es lo unico que importa a oscuras.
  */
 export function Silhouette({
@@ -85,39 +85,63 @@ export function Silhouette({
   );
 }
 
+/**
+ * Una cabeza distinta por sospechoso. Todas las formas se dibujan con el mismo
+ * relleno opaco y se superponen libremente: la figura es plana, asi que un
+ * mechon que tape la cara no se nota, solo cambia el contorno.
+ */
 function Headwear({ index }: { index: number }) {
-  switch (index % 4) {
-    // Sombrero cloche
+  switch (index % 7) {
+    // Fedora — el detective
     case 0:
-      return (
-        <>
-          <ellipse cx="100" cy="82" rx="47" ry="32" />
-          <ellipse cx="100" cy="100" rx="56" ry="11" />
-        </>
-      );
-    // Fedora
-    case 1:
       return (
         <>
           <ellipse cx="100" cy="76" rx="70" ry="11" />
           <path d="M68 78 L68 44 Q68 30 100 30 Q132 30 132 44 L132 78 Z" />
         </>
       );
-    // Rodete
+    // Cofia de ama de llaves — sin ala, para que no se confunda con el sombrero
+    case 1:
+      return (
+        <>
+          <path d="M60 92 Q58 48 100 48 Q142 48 140 92 Q120 80 100 80 Q80 80 60 92 Z" />
+          <ellipse cx="100" cy="88" rx="45" ry="7" />
+        </>
+      );
+    // Pelo corto peinado al costado
     case 2:
+      return (
+        <path d="M58 112 Q58 58 100 58 Q142 58 142 112 Q140 84 108 80 Q80 76 58 96 Z" />
+      );
+    // Galera
+    case 3:
+      return (
+        <>
+          <ellipse cx="100" cy="70" rx="62" ry="10" />
+          <path d="M72 70 L72 26 Q72 18 80 18 L120 18 Q128 18 128 26 L128 70 Z" />
+        </>
+      );
+    // Rodete alto
+    case 4:
       return (
         <>
           <circle cx="100" cy="52" r="21" />
           <path d="M60 116 Q56 58 100 58 Q144 58 140 116 Q140 84 100 84 Q60 84 60 116 Z" />
         </>
       );
-    // Gorra de servicio
-    default:
+    // Melena a los hombros
+    case 5:
       return (
         <>
-          <ellipse cx="100" cy="82" rx="60" ry="9" />
-          <path d="M66 84 L66 56 Q66 42 100 42 Q134 42 134 56 L134 84 Z" />
+          <path d="M58 112 Q58 56 100 56 Q142 56 142 112 Q142 84 100 84 Q58 84 58 112 Z" />
+          <path d="M58 96 Q46 148 54 174 L78 174 Q66 140 72 100 Z" />
+          <path d="M142 96 Q154 148 146 174 L122 174 Q134 140 128 100 Z" />
         </>
+      );
+    // Pelo corto revuelto — el mas joven de la casa
+    default:
+      return (
+        <path d="M62 110 Q56 62 84 60 Q90 44 106 56 Q140 54 138 110 Q132 82 100 80 Q72 78 62 110 Z" />
       );
   }
 }

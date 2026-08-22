@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 import { ConfirmBar } from "@/components/vote/ConfirmBar";
 import { Silhouette } from "@/components/vote/Silhouette";
+import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
 /**
@@ -11,8 +12,8 @@ import type { VariantProps } from "@/components/vote/variants/types";
  *
  * La mas teatral de las tres: cada personaje ocupa el celular entero, con su
  * color y su parrafo de acusacion. La seleccion sigue al scroll, asi que el
- * boton de abajo siempre apunta a quien estas mirando. Cuesta comparar los
- * cuatro, pero para eso hay indicadores de posicion arriba.
+ * boton de abajo siempre apunta a quien estas mirando. Cuesta comparar a los
+ * siete, pero para eso hay indicadores de posicion arriba.
  */
 export function SwipeVariant({
   options,
@@ -86,10 +87,8 @@ export function SwipeVariant({
       />
 
       <header className="absolute inset-x-0 top-0 z-20 px-4 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <p className="text-brass text-center text-[11px] font-semibold tracking-[0.25em] uppercase">
-          El veredicto
-        </p>
-        <div className="mt-3 flex justify-center gap-1.5">
+        <TitleEyebrow className="text-center" />
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5">
           {options.map((option, i) => (
             <button
               key={option.id}

@@ -28,7 +28,7 @@ export function ResultsBars({
     <ul className={compact ? "space-y-1.5" : "space-y-3"}>
       {options.map((option) => {
         const count = counts.get(option.id) ?? 0;
-        // Con 0 votos las cuatro barras quedan vacias en vez de repartirse 25%.
+        // Con 0 votos todas las barras quedan vacias en vez de repartirse el 100%.
         const pct = total > 0 ? (count / total) * 100 : 0;
         const isMine = myVote === option.id;
         const isWinner = winnerId === option.id;

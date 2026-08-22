@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+import { SHOW_TITLE } from "@/lib/constants";
+
 export const metadata: Metadata = {
-  title: "El veredicto",
-  description: "Votá el final de la obra.",
+  title: SHOW_TITLE,
+  description: "Votá quién fue.",
 };
 
 export const viewport: Viewport = {

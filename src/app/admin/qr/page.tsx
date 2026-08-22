@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 
 import { PrintButton } from "@/components/admin/PrintButton";
 import { isAdmin } from "@/lib/auth";
+import { SHOW_TITLE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -99,7 +100,10 @@ export default async function QrPage({
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- data URL generada en el server */}
               <img src={dataUrl} alt="" className="h-40 w-40" />
-              <p className="mt-2 text-sm font-semibold">Escaneá para votar</p>
+              <p className="mt-2 text-[10px] font-semibold tracking-[0.14em] text-neutral-500 uppercase">
+                {SHOW_TITLE}
+              </p>
+              <p className="mt-1 text-sm font-semibold">Escaneá para votar</p>
               <p className="mt-0.5 text-[10px] text-neutral-600">
                 Al final de la obra vas a decidir quién fue.
               </p>

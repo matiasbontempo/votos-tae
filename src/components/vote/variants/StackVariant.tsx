@@ -1,15 +1,18 @@
 "use client";
 
 import { Silhouette } from "@/components/vote/Silhouette";
+import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
 /**
- * Variante C · scroll vertical, un sospechoso por pantalla.
+ * Variante C · scroll vertical, un sospechoso por pantalla. Es la variante por
+ * defecto.
  *
- * Gesto de feed, que es el que todo el mundo tiene incorporado. A diferencia de
- * las otras dos no hay barra fija: el boton vive dentro del panel de cada
- * personaje y pide dos toques (el primero arma, el segundo confirma). Es la
- * variante mas dificil de votar por accidente.
+ * Gesto de feed, que es el que todo el mundo tiene incorporado, y el unico que
+ * escala sin dolor a siete sospechosos: cada uno sigue ocupando el celular
+ * entero. A diferencia de las otras dos no hay barra fija: el boton vive dentro
+ * del panel de cada personaje y pide dos toques (el primero arma, el segundo
+ * confirma). Es la variante mas dificil de votar por accidente.
  */
 export function StackVariant({
   options,
@@ -37,9 +40,7 @@ export function StackVariant({
             }}
           >
             {i === 0 && (
-              <p className="text-brass absolute inset-x-0 top-[max(1rem,env(safe-area-inset-top))] text-center text-[11px] font-semibold tracking-[0.25em] uppercase">
-                El veredicto
-              </p>
+              <TitleEyebrow className="absolute inset-x-0 top-[max(1rem,env(safe-area-inset-top))] px-14 text-center" />
             )}
 
             <span className="text-muted absolute top-[max(1rem,env(safe-area-inset-top))] right-5 text-[11px] tabular-nums">

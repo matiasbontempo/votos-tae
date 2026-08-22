@@ -14,7 +14,9 @@ function resolveUI(raw: string | undefined): VoteUI {
   if (fallback && (VOTE_UIS as string[]).includes(fallback)) {
     return fallback as VoteUI;
   }
-  return "swipe";
+  // Scroll vertical: el gesto de feed que todo el mundo ya tiene incorporado, y
+  // la variante que aguanta los siete sospechosos sin achicar a nadie.
+  return "stack";
 }
 
 /**

@@ -9,7 +9,7 @@ export type VoteUI = "grid" | "swipe" | "stack";
 export const VOTE_UIS: VoteUI[] = ["grid", "swipe", "stack"];
 
 export const VOTE_UI_LABELS: Record<VoteUI, string> = {
-  grid: "Grilla 2x2",
+  grid: "Grilla",
   swipe: "Swipe horizontal",
   stack: "Scroll vertical",
 };
@@ -23,7 +23,7 @@ export const VISIBILITY_LABELS: Record<ResultsVisibility, string> = {
 export const VISIBILITY_HINTS: Record<ResultsVisibility, string> = {
   live: "Todos ven las barras moverse desde el primer voto.",
   after_vote: "Cada uno ve los conteos recién después de elegir.",
-  hidden: "Nadie ve nada hasta que cerrás la votación.",
+  hidden: "Nadie ve los votos ajenos hasta que cerrás la votación. Es el default.",
 };
 
 export interface VoteOption {

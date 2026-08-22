@@ -2,14 +2,16 @@
 
 import { ConfirmBar } from "@/components/vote/ConfirmBar";
 import { Silhouette } from "@/components/vote/Silhouette";
+import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
 /**
- * Variante A · grilla 2x2.
+ * Variante A · grilla de dos columnas.
  *
- * Los cuatro sospechosos entran juntos en pantalla: es la unica de las tres
+ * Todos los sospechosos entran juntos en pantalla: es la unica de las tres
  * donde se comparan de un vistazo, y la mas rapida para alguien que ya sabe a
- * quien va a votar. A cambio, cada figura queda chica.
+ * quien va a votar. A cambio, cada figura queda chica — y con siete personajes
+ * son cuatro filas, que es el limite de lo que se lee a media luz.
  */
 export function GridVariant({
   options,
@@ -22,22 +24,34 @@ export function GridVariant({
   const counts = new Map(results?.tallies.map((t) => [t.optionId, t.count]));
   const selectedOption = options.find((o) => o.id === selected) ?? null;
 
+  const rows = Math.max(1, Math.ceil(options.length / 2));
+  // Con mas de dos filas cada tarjeta pierde la mitad del alto: bajamos la
+  // tipografia antes de que el nombre empiece a chocar con la silueta.
+  const dense = rows > 2;
+
   return (
-    // Altura fija y overflow-hidden: las cuatro tarjetas tienen que entrar en
+    // Altura fija y overflow-hidden: todas las tarjetas tienen que entrar en
     // pantalla si o si. Es la premisa de esta variante — si hay que scrollear
-    // para ver al cuarto sospechoso, ya es la variante C.
+    // para ver al ultimo sospechoso, ya es la variante C.
     <div className="flex h-screen-safe flex-col overflow-hidden px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-28">
       <header className="mb-3 shrink-0 text-center">
-        <p className="text-brass text-[11px] font-semibold tracking-[0.25em] uppercase">
-          El veredicto
-        </p>
-        <h1 className="font-display mt-1 text-2xl">¿Quién fue?</h1>
+        <TitleEyebrow />
+        <h1 className={`font-display mt-1 ${dense ? "text-xl" : "text-2xl"}`}>
+          ¿Quién fue?
+        </h1>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2.5">
+      <div
+        className="grid min-h-0 flex-1 grid-cols-2 gap-2.5"
+        style={{ gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+      >
         {options.map((option, i) => {
           const isSelected = selected === option.id;
           const count = counts.get(option.id);
+          // Numero impar de sospechosos: el ultimo se queda solo en su fila y
+          // ocupa el ancho entero en vez de dejar un hueco.
+          const isLastAlone =
+            options.length % 2 === 1 && i === options.length - 1;
 
           return (
             <button
@@ -45,7 +59,9 @@ export function GridVariant({
               type="button"
               onClick={() => onSelect(isSelected ? null : option.id)}
               aria-pressed={isSelected}
-              className="relative flex min-h-0 min-w-0 flex-col items-center justify-end overflow-hidden rounded-2xl border transition-all duration-300"
+              className={`relative flex min-h-0 min-w-0 flex-col items-center justify-end overflow-hidden rounded-2xl border transition-all duration-300 ${
+                isLastAlone ? "col-span-2" : ""
+              }`}
               style={{
                 borderColor: isSelected ? option.color : "rgba(255,255,255,0.09)",
                 backgroundColor: isSelected
@@ -56,18 +72,32 @@ export function GridVariant({
               }}
             >
               <div
-                className="min-h-0 w-full flex-1 pt-3 transition-opacity duration-300"
+                className={`min-h-0 w-full flex-1 transition-opacity duration-300 ${
+                  dense ? "pt-2" : "pt-3"
+                }`}
                 style={{ opacity: isSelected ? 1 : 0.62 }}
               >
                 <Silhouette option={option} index={i} />
               </div>
 
-              <div className="w-full bg-gradient-to-t from-black/75 to-transparent px-2 pt-6 pb-2.5 text-center">
-                <p className="font-display truncate text-[15px] leading-tight">
+              <div
+                className={`w-full bg-gradient-to-t from-black/75 to-transparent px-2 text-center ${
+                  dense ? "pt-4 pb-2" : "pt-6 pb-2.5"
+                }`}
+              >
+                <p
+                  className={`font-display truncate leading-tight ${
+                    dense ? "text-[13px]" : "text-[15px]"
+                  }`}
+                >
                   {option.name}
                 </p>
                 {option.subtitle && (
-                  <p className="text-muted truncate text-[10px] tracking-wide uppercase">
+                  <p
+                    className={`text-muted truncate tracking-wide uppercase ${
+                      dense ? "text-[9px]" : "text-[10px]"
+                    }`}
+                  >
                     {option.subtitle}
                   </p>
                 )}
