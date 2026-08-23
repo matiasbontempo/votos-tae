@@ -75,9 +75,25 @@ La variante por defecto se fija con `NEXT_PUBLIC_DEFAULT_VOTE_UI`.
    de los sospechosos nuevos. Una función *abierta* conserva la visibilidad que
    tenía: si querés taparle los conteos, cambialo desde el panel.
 
-   Los placeholders `a`..`d` se borran solos salvo que tengan votos. Si te
-   quedaron votos de ensayo encima, borralos («Borrar todos los votos» en el
-   panel, o finalizá esa función) y volvé a correr el archivo.
+   Los placeholders `a`..`d` se borran solos **salvo que tengan votos**, y ahí
+   el público los ve mezclados con los sospechosos reales. Ojo que «Borrar
+   todos los votos» del panel solo limpia la función actual: los ensayos ya
+   finalizados también cuentan. Para sacarlos, en el SQL Editor:
+
+   ```sql
+   -- 1. Mirá qué se va a borrar
+   select o.id, o.name, count(v.id) as votos, count(distinct v.show_id) as funciones
+     from options o left join votes v on v.option_id = o.id
+    where o.id in ('a', 'b', 'c', 'd')
+    group by o.id, o.name order by o.id;
+
+   -- 2. Si son todos de ensayo, limpiá
+   delete from votes   where option_id in ('a', 'b', 'c', 'd');
+   delete from options where id        in ('a', 'b', 'c', 'd');
+   ```
+
+   Las funciones viejas quedan en el historial; la que tuviera uno de esos
+   personajes como ganador fijado vuelve a conteo automático.
 3. Los siete sospechosos ya están cargados al final de `schema.sql`, en el
    `insert into public.options`. Ese insert es un upsert: si volvés a correr el
    archivo, pisa nombre, bajada, párrafo, color y orden con lo que diga el
