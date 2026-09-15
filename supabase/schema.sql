@@ -216,7 +216,7 @@ end
 $$;
 
 -- ---------------------------------------------------------------------------
--- 7. Los sospechosos de "Asesinato en la Mansion Greenstout"
+-- 7. Los sospechosos de "Agravado por el Vinculo"
 -- ---------------------------------------------------------------------------
 -- Los `blurb` son de relleno: cambiarlos por el texto real de la obra. Los `id`
 -- conviene dejarlos fijos una vez que hubo funciones reales, porque los votos

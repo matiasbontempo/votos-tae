@@ -8,4 +8,4 @@ export const DEVICE_STORAGE_KEY = "tae_device_id";
  * votacion y en la hoja de QR de las butacas: vive en un solo lugar para que no
  * quede una pantalla con el nombre viejo.
  */
-export const SHOW_TITLE = "Asesinato en la Mansión Greenstout";
+export const SHOW_TITLE = "Agravado por el Vínculo";

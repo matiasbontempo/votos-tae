@@ -1,8 +1,8 @@
-# Asesinato en la Mansión Greenstout · votación en sala
+# Agravado por el Vínculo · votación en sala
 
-App de votación en sala para *Asesinato en la Mansión Greenstout*. El público
-escanea un QR desde la butaca, acusa a uno de los siete sospechosos, y el panel
-de backstage controla cuándo se abre y se cierra la votación.
+App de votación en sala para *Agravado por el Vínculo*. El público escanea un
+QR desde la butaca, acusa a uno de los siete sospechosos, y el panel de
+backstage controla cuándo se abre y se cierra la votación.
 
 Los sospechosos:
 
