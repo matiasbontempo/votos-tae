@@ -20,12 +20,19 @@ El título vive en `src/lib/constants.ts` (`SHOW_TITLE`) y los personajes al
 final de `supabase/schema.sql`. Los párrafos de acusación de cada uno son de
 relleno: reemplazalos por el texto real de la obra.
 
-Dos pantallas:
+Tres pantallas:
 
-- **`/`** — lo que ve el público. Es la raíz del sitio, así que el QR codifica
-  el dominio pelado y el mismo papel sirve para todas las funciones.
+- **`/votar`** — lo que ve el público. El QR de la butaca apunta acá, y el mismo
+  papel sirve para todas las funciones.
 - **`/admin`** — backstage: abrir y cerrar la votación, ver los votos en vivo,
   resolver empates, finalizar la función, imprimir los QR.
+- **`/`** — la landing de la obra. Hoy es un placeholder con un link a votar;
+  se reemplaza por la página real (sinopsis, elenco, entradas) sin tocar nada
+  de la votación.
+
+La ruta de votación vive en `VOTE_PATH` (`src/lib/constants.ts`), que es lo que
+usa el generador de QR: si algún día se mueve, el papel se genera solo con la
+ruta nueva.
 
 ---
 
@@ -36,7 +43,7 @@ npm install
 npm run demo
 ```
 
-Abrí <http://localhost:3000> y <http://localhost:3000/admin> (contraseña:
+Abrí <http://localhost:3000/votar> y <http://localhost:3000/admin> (contraseña:
 `demo`). Todo corre en memoria: no necesita Supabase ni internet, y se reinicia
 cuando reiniciás el server.
 
@@ -45,9 +52,9 @@ decidir cuál se usa en la sala:
 
 | Variante | URL | Cómo se vota |
 | --- | --- | --- |
-| Scroll vertical **(default)** | `/?ui=stack` | Gesto de feed. El botón vive en cada panel y pide dos toques. |
-| Swipe horizontal | `/?ui=swipe` | Un sospechoso por pantalla completa. El botón sigue a quien estás mirando. |
-| Grilla | `/?ui=grid` | Los siete juntos en pantalla. Tocás uno, después confirmás abajo. |
+| Scroll vertical **(default)** | `/votar?ui=stack` | Gesto de feed. El botón vive en cada panel y pide dos toques. |
+| Swipe horizontal | `/votar?ui=swipe` | Un sospechoso por pantalla completa. El botón sigue a quien estás mirando. |
+| Grilla | `/votar?ui=grid` | Los siete juntos en pantalla. Tocás uno, después confirmás abajo. |
 
 El default es **scroll vertical**: con siete sospechosos es la única que le
 puede dar el celular entero a cada uno sin pedir un gesto que haya que explicar.
@@ -174,6 +181,23 @@ pantalla se lee de un vistazo a oscuras.
   si se cayó) y un refresco al volver del background. El wifi de un teatro lleno
   tira conexiones, y perderse el «abrió la votación» es el único error que esta
   app no se puede permitir.
+
+### Por qué el voto se siente instantáneo
+
+Son dos cosas distintas, y conviene no confundirlas al buscar lentitud:
+
+- **La pantalla no espera al servidor.** Al tocar, el voto se pinta de una
+  (`withOptimisticVote` en `VoteApp.tsx`) y la respuesta del POST lo confirma
+  después. Si el servidor lo rechaza, la pantalla vuelve atrás sola y aparece el
+  error.
+- **El POST hace dos viajes a Supabase, no seis.** `/api/vote` trae la función y
+  las opciones en un solo viaje paralelo, valida el `optionId` en memoria,
+  inserta, y arma la respuesta con lo que ya tiene (`composePublicState`). Solo
+  vuelve a la base si hay conteos para mostrar.
+
+Si algún día el voto vuelve a sentirse lento, mirá primero estos dos puntos y la
+región del proyecto de Supabase. El websocket no interviene: eso es lo que
+avisa a *los demás* que votaste, no lo que registra tu voto.
 
 ### Un voto por dispositivo
 

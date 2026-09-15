@@ -12,9 +12,6 @@ export const viewport: Viewport = {
   themeColor: "#0b0a0f",
   width: "device-width",
   initialScale: 1,
-  // Que no se pueda hacer pinch-zoom sobre los botones de voto en plena escena.
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({

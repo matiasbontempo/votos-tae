@@ -16,6 +16,7 @@ import {
   type ActionResult,
 } from "@/lib/actions";
 import type { AdminState } from "@/lib/admin-data";
+import { VOTE_PATH } from "@/lib/constants";
 import {
   VISIBILITY_HINTS,
   VISIBILITY_LABELS,
@@ -327,7 +328,7 @@ export function AdminDashboard({ initialState }: { initialState: AdminState }) {
                 {VOTE_UIS.map((v) => (
                   <a
                     key={v}
-                    href={`/?ui=${v}`}
+                    href={`${VOTE_PATH}?ui=${v}`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-muted hover:text-parchment rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-xs"

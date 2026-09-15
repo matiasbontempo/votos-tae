@@ -1,7 +1,13 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 
-import { getLiveShow, getPublicState } from "@/lib/data";
+import {
+  composePublicState,
+  getDeviceVote,
+  getLiveShow,
+  getOptions,
+  getPublicState,
+} from "@/lib/data";
 import { demoVote, isDemo } from "@/lib/demo-store";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
@@ -68,7 +74,11 @@ export async function POST(request: Request) {
   // La funcion se resuelve en el servidor, no se confia en la que mande el
   // cliente: asi un celular con la pagina vieja abierta no puede votar en una
   // funcion que ya termino.
-  const show = await getLiveShow();
+  //
+  // Las opciones se traen en el mismo viaje aunque todavia no se usen: sirven
+  // para validar el optionId sin una query aparte, y son la mitad del estado
+  // que hay que devolver. Pedirlas despues costaba dos saltos mas.
+  const [show, options] = await Promise.all([getLiveShow(), getOptions()]);
 
   if (!show) {
     return NextResponse.json(
@@ -84,10 +94,20 @@ export async function POST(request: Request) {
           show.status === "idle"
             ? "La votación todavía no abrió."
             : "La votación ya cerró.",
-        state: await getPublicState(deviceId),
+        state: await composePublicState({
+          show,
+          options,
+          myVote: await getDeviceVote(show.id, deviceId),
+        }),
       },
       { status: 409 },
     );
+  }
+
+  // Validar contra las opciones que ya trajimos no cuesta una query, asi que va
+  // antes de la rama demo: el ensayo se comporta igual que la funcion real.
+  if (!options.some((o) => o.id === optionId)) {
+    return NextResponse.json({ error: "Esa opción no existe." }, { status: 400 });
   }
 
   if (isDemo()) {
@@ -97,16 +117,6 @@ export async function POST(request: Request) {
       alreadyVoted: "alreadyVoted" in result ? result.alreadyVoted : false,
       state: await getPublicState(deviceId),
     });
-  }
-
-  const { data: option } = await supabaseAdmin()
-    .from("options")
-    .select("id")
-    .eq("id", optionId)
-    .maybeSingle();
-
-  if (!option) {
-    return NextResponse.json({ error: "Esa opción no existe." }, { status: 400 });
   }
 
   const ipHash = clientIpHash(request);
@@ -133,11 +143,16 @@ export async function POST(request: Request) {
 
   // Si fue violacion de unicidad el dispositivo ya habia votado: no es un error
   // para el usuario, simplemente le devolvemos el estado con su voto original.
+  // Ese es el unico caso que obliga a preguntarle a la base que voto; en el
+  // camino normal ya lo sabemos, porque lo acabamos de insertar.
   const alreadyVoted = error?.code === UNIQUE_VIOLATION;
+  const myVote = alreadyVoted
+    ? await getDeviceVote(show.id, deviceId)
+    : optionId;
 
   return NextResponse.json({
     ok: true,
     alreadyVoted,
-    state: await getPublicState(deviceId),
+    state: await composePublicState({ show, options, myVote }),
   });
 }

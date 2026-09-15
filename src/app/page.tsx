@@ -1,40 +1,44 @@
-import { cookies } from "next/headers";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import { VoteApp } from "@/components/vote/VoteApp";
-import { DEVICE_COOKIE } from "@/lib/constants";
-import { getPublicState } from "@/lib/data";
-import { VOTE_UIS, type VoteUI } from "@/lib/types";
-
-export const dynamic = "force-dynamic";
-
-function resolveUI(raw: string | undefined): VoteUI {
-  if (raw && (VOTE_UIS as string[]).includes(raw)) return raw as VoteUI;
-
-  const fallback = process.env.NEXT_PUBLIC_DEFAULT_VOTE_UI;
-  if (fallback && (VOTE_UIS as string[]).includes(fallback)) {
-    return fallback as VoteUI;
-  }
-  // Scroll vertical: el gesto de feed que todo el mundo ya tiene incorporado, y
-  // la variante que aguanta los siete sospechosos sin achicar a nadie.
-  return "stack";
-}
+import { SHOW_TITLE, VOTE_PATH } from "@/lib/constants";
 
 /**
- * Pantalla del publico. Es la raiz del sitio a proposito: el QR de la butaca
- * codifica el dominio pelado y nada mas, que es lo que mejor escanea a oscuras.
+ * PLACEHOLDER de la landing de la obra.
  *
- * `?ui=grid|swipe|stack` fuerza una variante para probar en ensayo sin tocar
- * la configuracion.
+ * La raiz existe para la landing (sinopsis, elenco, funciones, entradas), que
+ * se escribe aparte. Mientras tanto esta pagina ocupa el lugar y, sobre todo,
+ * no deja varado a nadie: el que escribe el dominio pelado en vez de escanear
+ * el QR tiene que poder llegar a votar igual.
+ *
+ * Al reemplazarla por la landing de verdad: sacar el `robots` de abajo, que
+ * esta puesto para que Google no se quede con esta version de transicion.
  */
-export default async function VotePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ ui?: string }>;
-}) {
-  const [{ ui }, cookieStore] = await Promise.all([searchParams, cookies()]);
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
-  const deviceId = cookieStore.get(DEVICE_COOKIE)?.value ?? null;
-  const state = await getPublicState(deviceId);
+export default function LandingPlaceholder() {
+  return (
+    <main className="stage-bg min-h-screen-safe flex flex-col items-center justify-center px-6 text-center">
+      <p className="text-brass text-[11px] font-semibold tracking-[0.25em] uppercase">
+        Teatro
+      </p>
 
-  return <VoteApp initialState={state} ui={resolveUI(ui)} />;
+      <h1 className="font-display text-parchment mt-3 text-4xl leading-tight sm:text-5xl">
+        {SHOW_TITLE}
+      </h1>
+
+      <p className="text-muted mt-6 max-w-md text-sm leading-relaxed">
+        La página de la obra está en construcción. Si viniste a votar, entrá acá.
+      </p>
+
+      <Link
+        href={VOTE_PATH}
+        className="bg-brass text-ink hover:bg-brass-soft mt-8 rounded-xl px-6 py-3 text-sm font-semibold transition-colors"
+      >
+        Ir a votar
+      </Link>
+    </main>
+  );
 }

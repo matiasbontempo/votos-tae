@@ -40,6 +40,13 @@ export function VoteApp({
   // sin volver a suscribirse cada vez que cambia.
   const deviceIdRef = useRef<string | null>(null);
 
+  // Ultimo estado renderizado, para poder volver atras si el voto optimista
+  // termina rechazado.
+  const stateRef = useRef<PublicState>(initialState);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   const refresh = useCallback(async () => {
     const id = deviceIdRef.current;
     if (!id) return;
@@ -141,6 +148,14 @@ export function VoteApp({
       setSubmitting(true);
       setError(null);
 
+      // Voto optimista: la pantalla cambia en el toque, no cuando vuelve el
+      // POST. El voto ya quedo decidido en la cabeza del espectador; hacerlo
+      // esperar el round trip con la obra en escena es lo que se sentia lento.
+      // Si el servidor lo rechaza, volvemos a `previous`.
+      const previous = stateRef.current;
+      setState((prev) => withOptimisticVote(prev, optionId));
+      navigator.vibrate?.(35);
+
       try {
         const res = await fetch("/api/vote", {
           method: "POST",
@@ -152,14 +167,19 @@ export function VoteApp({
           state?: PublicState;
         };
 
-        if (data.state) setState(data.state);
-        if (!res.ok) {
-          setError(data.error ?? "No pudimos registrar tu voto.");
-          return;
+        // El estado del servidor es el que manda: pisa al optimista, tanto si
+        // confirmo el voto como si lo rechazo por funcion cerrada.
+        if (data.state) {
+          setState(data.state);
+        } else if (!res.ok) {
+          setState(previous);
         }
 
-        navigator.vibrate?.(35);
+        if (!res.ok) {
+          setError(data.error ?? "No pudimos registrar tu voto.");
+        }
       } catch {
+        setState(previous);
         setError("No pudimos registrar tu voto. Revisá la señal y probá de nuevo.");
       } finally {
         setSubmitting(false);
@@ -254,9 +274,15 @@ export function VoteApp({
               {total} {total === 1 ? "voto" : "votos"} · sigue abierta
             </p>
           </div>
-        ) : (
+        ) : show.resultsVisibility === "hidden" ? (
           <p className="text-muted mt-8 text-center text-xs">
             Los resultados se revelan cuando cierre la votación.
+          </p>
+        ) : (
+          // Con los conteos habilitados, este hueco dura lo que tarda el POST
+          // en volver con los numeros: el voto ya se pinto de forma optimista.
+          <p className="text-muted mt-8 text-center text-xs">
+            Contando los votos…
           </p>
         )}
       </Screen>
@@ -290,6 +316,26 @@ export function VoteApp({
       )}
     </main>
   );
+}
+
+/**
+ * Estado con el voto ya aplicado, antes de que conteste el servidor.
+ *
+ * Los conteos se tocan solo si el publico ya los estaba viendo (visibilidad
+ * "en vivo"): si todavia no los ve, no hay barra que mover y alcanza con marcar
+ * el voto propio. El websocket y la respuesta del POST traen despues los
+ * numeros absolutos, asi que este +1 no puede quedar sumado dos veces.
+ */
+function withOptimisticVote(prev: PublicState, optionId: string): PublicState {
+  if (!prev.tallies || prev.total === null) {
+    return { ...prev, myVote: optionId };
+  }
+
+  const tallies = prev.tallies.map((t) =>
+    t.optionId === optionId ? { ...t, count: t.count + 1 } : t,
+  );
+
+  return { ...prev, myVote: optionId, tallies, total: prev.total + 1 };
 }
 
 /** La opcion mas votada, o null si hay empate o no hay votos. */

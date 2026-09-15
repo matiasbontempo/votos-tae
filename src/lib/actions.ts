@@ -9,6 +9,7 @@ import {
   requireAdmin,
   startAdminSession,
 } from "@/lib/auth";
+import { VOTE_PATH } from "@/lib/constants";
 import { getLiveShow } from "@/lib/data";
 import {
   demoCreateShow,
@@ -82,7 +83,7 @@ export async function createShowAction(
   }
 
   revalidatePath("/admin");
-  revalidatePath("/");
+  revalidatePath(VOTE_PATH);
   return {};
 }
 
@@ -212,7 +213,7 @@ function finish(result: ActionResult): ActionResult {
   if (result.error) return result;
 
   revalidatePath("/admin");
-  revalidatePath("/");
+  revalidatePath(VOTE_PATH);
   return {};
 }
 
@@ -224,7 +225,7 @@ async function updateShow(
   if (error) return fail(`No se pudo actualizar la función: ${error.message}`);
 
   revalidatePath("/admin");
-  revalidatePath("/");
+  revalidatePath(VOTE_PATH);
   return {};
 }
 

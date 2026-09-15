@@ -5,12 +5,13 @@ import QRCode from "qrcode";
 
 import { PrintButton } from "@/components/admin/PrintButton";
 import { isAdmin } from "@/lib/auth";
-import { SHOW_TITLE } from "@/lib/constants";
+import { SHOW_TITLE, VOTE_PATH } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Dominio que se codifica en el QR, del mas explicito al mas adivinado.
+ * Origen del sitio, del mas explicito al mas adivinado. El QR le agrega
+ * despues la ruta de votacion.
  *
  * El host del request va ANTES de la variable de Vercel a proposito: si el
  * proyecto tiene dominio propio, `VERCEL_PROJECT_PRODUCTION_URL` igual devuelve
@@ -43,7 +44,12 @@ export default async function QrPage({
   if (!(await isAdmin())) redirect("/admin");
 
   const { url: override, copias } = await searchParams;
-  const url = await siteUrl(override);
+
+  // El QR apunta a la pantalla de votacion, no a la raiz: la raiz es la landing
+  // de la obra. Si alguien pasa `?url=`, se respeta tal cual (sirve para probar
+  // un dominio que todavia no esta conectado).
+  const origin = await siteUrl(override);
+  const url = override?.startsWith("http") ? origin : `${origin}${VOTE_PATH}`;
 
   // Correccion de errores alta: el papel pegado en una butaca se dobla, se raya
   // y se lee a media luz.
@@ -73,9 +79,9 @@ export default async function QrPage({
           <p className="text-muted mt-4 font-mono text-xs break-all">{url}</p>
 
           <p className="text-muted mx-auto mt-6 max-w-sm text-sm leading-relaxed">
-            Imprimí la hoja y pegá un código por butaca. Apunta a la raíz del
-            sitio, así que el mismo QR sirve para todas las funciones: lo que
-            ve el público depende del estado que fijes en el panel.
+            Imprimí la hoja y pegá un código por butaca. Apunta a la pantalla
+            de votación, así que el mismo QR sirve para todas las funciones: lo
+            que ve el público depende del estado que fijes en el panel.
           </p>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">

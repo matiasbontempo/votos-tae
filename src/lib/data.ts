@@ -126,18 +126,31 @@ export async function getDeviceVote(
 }
 
 /**
- * Estado que consume la pantalla publica. Los conteos se omiten (null) cuando
- * la configuracion de la funcion todavia no permite mostrarlos — el filtro vive
- * en el servidor a proposito, para que no se puedan espiar desde devtools.
+ * Arma el estado publico con lo que el llamador ya tiene en la mano, y pide a
+ * la base solo lo que falta (los conteos, y solo si se pueden mostrar).
+ *
+ * Existe por /api/vote: esa ruta ya trajo la funcion y las opciones para
+ * validar, y sabe que voto el dispositivo porque lo acaba de insertar. Cuando
+ * terminaba llamando a getPublicState, volvia a pedir las tres cosas: cada voto
+ * pagaba seis viajes a Supabase en serie —dos de ellos repetidos— con el dedo
+ * del espectador esperando los seis.
+ *
+ * Los conteos se omiten (null) cuando la configuracion de la funcion todavia no
+ * permite mostrarlos — el filtro vive en el servidor a proposito, para que no se
+ * puedan espiar desde devtools.
  */
-export async function getPublicState(deviceId: string | null): Promise<PublicState> {
-  const [options, show] = await Promise.all([getOptions(), getLiveShow()]);
-
+export async function composePublicState({
+  show,
+  options,
+  myVote,
+}: {
+  show: Show | null;
+  options: VoteOption[];
+  myVote: string | null;
+}): Promise<PublicState> {
   if (!show) {
     return { show: null, options, tallies: null, total: null, myVote: null };
   }
-
-  const myVote = await getDeviceVote(show.id, deviceId);
 
   if (!canSeeResults(show, myVote !== null)) {
     return { show, options, tallies: null, total: null, myVote };
@@ -151,4 +164,16 @@ export async function getPublicState(deviceId: string | null): Promise<PublicSta
     total: tallies.reduce((sum, t) => sum + t.count, 0),
     myVote,
   };
+}
+
+/** Estado que consume la pantalla publica, partiendo de cero. */
+export async function getPublicState(deviceId: string | null): Promise<PublicState> {
+  const [options, show] = await Promise.all([getOptions(), getLiveShow()]);
+
+  if (!show) {
+    return { show: null, options, tallies: null, total: null, myVote: null };
+  }
+
+  const myVote = await getDeviceVote(show.id, deviceId);
+  return composePublicState({ show, options, myVote });
 }
