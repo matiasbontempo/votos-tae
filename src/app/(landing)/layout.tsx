@@ -11,19 +11,21 @@ import "./landing.css";
  * Layout de la landing, y solo de la landing: las fuentes se cargan aca, asi
  * /votar y /admin no pagan un byte de Fraunces ni de Bricolage.
  *
- * Fraunces lleva los ejes SOFT y WONK ademas del peso: son los que le dan el
- * calor de los setenta del flyer. Bricolage solo el eje optico.
+ * De Fraunces se pide el peso y SOFT, que es el eje que le da el redondeo
+ * calido de los setenta del flyer. Los otros dos que tiene (WONK, con las
+ * letras raras, y opsz, el tamaño optico) se dejaron afuera: sumaban 92 KB
+ * entre las dos familias y en pantalla no se notaba la diferencia. En una
+ * pagina que se abre desde Instagram en el colectivo, eso pesa mas.
  */
 const fraunces = Fraunces({
   subsets: ["latin"],
-  axes: ["opsz", "SOFT", "WONK"],
+  axes: ["SOFT"],
   variable: "--font-fraunces",
   display: "swap",
 });
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["opsz"],
   variable: "--font-bricolage",
   display: "swap",
 });
