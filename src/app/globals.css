@@ -55,6 +55,13 @@ body {
   min-height: 100svh;
 }
 
+/* El identikit se funde con el fondo por abajo, como la silueta dibujada: el
+   recorte del busto no tiene que verse como un borde. */
+.identikit-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+}
+
 /* --------------------------------------------------------------------------
    Scroll-snap para las variantes swipe / stack
    -------------------------------------------------------------------------- */

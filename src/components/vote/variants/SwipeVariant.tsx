@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { ConfirmBar } from "@/components/vote/ConfirmBar";
-import { Silhouette } from "@/components/vote/Silhouette";
+import { Identikit } from "@/components/vote/Identikit";
 import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
@@ -116,7 +116,7 @@ export function SwipeVariant({
               className="snap-panel flex h-full flex-col items-center justify-end px-6 pb-28"
             >
               <div className="min-h-0 w-full max-w-[300px] flex-1 pt-24">
-                <Silhouette option={option} index={i} />
+                <Identikit option={option} index={i} frame />
               </div>
 
               <div className="mt-4 w-full max-w-sm shrink-0 text-center">

@@ -18,7 +18,8 @@ Los sospechosos:
 
 El título vive en `src/lib/constants.ts` (`SHOW_TITLE`) y los personajes al
 final de `supabase/schema.sql`. Los párrafos de acusación de cada uno son de
-relleno: reemplazalos por el texto real de la obra.
+relleno: reemplazalos por el texto real de la obra. Quién interpreta a cada uno
+(y con qué identikit) vive en `src/lib/cast.ts`; ver «Identikits y elenco».
 
 Tres pantallas:
 
@@ -127,8 +128,11 @@ página.
 
 ## El día de la función
 
-1. **`/admin` → Crear función.** Queda en «sin abrir»: el público que escanee
-   antes de tiempo ve una pantalla de espera que se despierta sola.
+1. **`/admin` → Crear función.** Si esa noche Lady Maid o Mary Caissings las
+   hace otra actriz, elegilo ahí mismo en «Elenco de hoy»: el público ve el
+   identikit de quien está en escena. Se puede corregir después desde el panel
+   sin tocar los votos. Queda en «sin abrir»: el público que escanee antes de
+   tiempo ve una pantalla de espera que se despierta sola.
 2. **Elegir qué ve el público** (se puede cambiar en cualquier momento):
    - **Ocultos** — nadie ve los votos ajenos hasta que cerrás. Es el default y
      la única de las tres que es hermética de verdad (ver «Privacidad de los
@@ -154,19 +158,60 @@ página.
 
 ---
 
-## Fotos de los actores
+## Identikits y elenco
 
-Las siluetas dibujadas son un placeholder. Para usar las fotos reales:
+Cada sospechoso se muestra como un identikit dibujado (`Identikit.tsx`): el
+dibujo sobre un halo del color del personaje, con las anotaciones de un
+expediente al margen. Mientras falte el archivo de alguno, esa tarjeta muestra
+la silueta dibujada por código, así que se puede ir cargando de a uno.
 
-1. Recortar cada uno de los siete actores en PNG con fondo transparente
-   (vertical, pensado para verse contra negro).
-2. Subirlas a **Supabase → Storage**, en un bucket público.
-3. Pegar la URL de cada una en la columna `image_url` de su fila en `options`.
+### Cargar los dibujos
 
-`Silhouette.tsx` usa la foto automáticamente cuando `image_url` no está vacío;
-no hay que tocar código. Mientras tanto dibuja una silueta distinta por
-sospechoso (sombrero, cofia, rodete, melena…), que alcanza para saber si la
-pantalla se lee de un vistazo a oscuras.
+1. Partir de los PNG originales, blanco y negro con fondo transparente,
+   recortados al busto (el script recorta el margen transparente sobrante).
+   Con que tengan **900 px de ancho o más** alcanza; más resolución no se ve.
+2. Nombrarlos como dice `src/lib/cast.ts` (`noah.png`, `maid-a.png`,
+   `maid-b.png`, `mary-a.png`, `mary-b.png`, …) y correr
+
+   ```bash
+   npm run identikits -- ~/carpeta/con/los/png
+   ```
+
+   Deja los WebP listos en `public/identikits/`. Se commitean con el código:
+   son parte de la obra, no datos de una función.
+
+Por qué WebP y 900 px: el dibujo nunca ocupa más de ~300 px CSS en pantalla, y
+un celular actual tiene pantalla 3x, así que 900 px es el tope de lo que
+alguien puede distinguir. WebP con pérdida (calidad 82) y canal alfa deja un
+dibujo a lápiz en grises idéntico al PNG a un quinto o un décimo del peso: unos
+40–80 KB por identikit en vez de 300–600 KB. En el wifi de un teatro lleno, con
+cuarenta celulares bajando los siete a la vez, esa es la diferencia entre que
+aparezcan al toque o de a uno.
+
+`image_url` en la tabla `options` sigue existiendo como respaldo: se usa solo
+para un personaje que no tenga identikit en `cast.ts` (por ejemplo, una foto
+subida a Supabase Storage).
+
+### Cuando cambia el elenco
+
+En algunas fechas Lady Maid y Mary Caissings las hace otra actriz, y el
+identikit tiene que ser el de quien está en escena. Eso se resuelve en dos
+lugares:
+
+- **`src/lib/cast.ts`** lista, por personaje, los actores posibles: un `id`
+  estable, la etiqueta que muestra el panel (poné el nombre de la actriz) y el
+  archivo de su identikit. El primero de la lista es el elenco por defecto.
+  Para sumar un reemplazo a otro personaje alcanza con agregarlo a su lista y
+  cargar el dibujo; el panel lo empieza a preguntar solo.
+- **`shows.casting`** guarda, por función, qué actor se eligió para cada
+  personaje que tiene más de uno (`{ "maid": "b" }`). Se elige al crear la
+  función en `/admin`, y se puede cambiar después desde la tarjeta «Elenco de
+  hoy». Como la elección queda en la función, el historial sabe con qué elenco
+  se jugó cada noche.
+
+Cambiar el elenco con la votación abierta es inocuo: cambia el dibujo que ve el
+público (los celulares se actualizan solos, como con cualquier cambio en la
+función) y no toca ningún voto.
 
 ---
 
@@ -243,7 +288,7 @@ hermético hasta el cierre, usar **ocultos**.
 
 La lógica que más importa vive en SQL: los triggers de conteo, el índice que
 garantiza una sola función viva a la vez, y las policies de RLS. `supabase/
-schema.test.sql` las verifica (22 aserciones) contra un Postgres local:
+schema.test.sql` las verifica (25 aserciones) contra un Postgres local:
 
 ```bash
 createdb votos_test

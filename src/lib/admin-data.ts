@@ -1,5 +1,6 @@
 import "server-only";
 
+import { applyCasting } from "@/lib/cast";
 import { getLiveShow, getOptions, getTallies, mapShow } from "@/lib/data";
 import { demoHistory, isDemo } from "@/lib/demo-store";
 import { supabaseAdmin } from "@/lib/supabase/server";
@@ -32,7 +33,7 @@ export async function getAdminState(): Promise<AdminState> {
 
   return {
     show,
-    options,
+    options: applyCasting(options, show?.casting ?? {}),
     tallies,
     total: tallies.reduce((sum, t) => sum + t.count, 0),
     history,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Silhouette } from "@/components/vote/Silhouette";
+import { Identikit } from "@/components/vote/Identikit";
 import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
@@ -48,7 +48,7 @@ export function StackVariant({
             </span>
 
             <div className="min-h-0 w-full max-w-[290px] flex-1 pt-20">
-              <Silhouette option={option} index={i} />
+              <Identikit option={option} index={i} frame />
             </div>
 
             <div className="mt-4 w-full max-w-sm shrink-0 text-center">

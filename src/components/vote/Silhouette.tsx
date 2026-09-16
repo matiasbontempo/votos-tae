@@ -1,12 +1,12 @@
 import type { VoteOption } from "@/lib/types";
 
 /**
- * Marcador de posicion para la foto recortada del actor.
+ * Silueta dibujada por codigo, una distinta por sospechoso.
  *
- * Cuando existan los PNG con fondo transparente se cargan en
- * `options.image_url` y este componente los usa en lugar del dibujo. Hay una
- * silueta distinta por sospechoso a proposito: sirven para juzgar si la
- * pantalla se lee de un vistazo, que es lo unico que importa a oscuras.
+ * Es el respaldo del identikit (ver `Identikit.tsx`): se muestra mientras a un
+ * personaje le falte el dibujo en `public/identikits/`, o si el archivo no
+ * carga. Sirve para juzgar si la pantalla se lee de un vistazo, que es lo
+ * unico que importa a oscuras.
  */
 export function Silhouette({
   option,
@@ -17,18 +17,6 @@ export function Silhouette({
   index: number;
   className?: string;
 }) {
-  if (option.imageUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- recortes servidos desde Supabase Storage, sin optimizar
-      <img
-        src={option.imageUrl}
-        alt={option.name}
-        className={`h-full w-full object-contain object-bottom ${className}`}
-        draggable={false}
-      />
-    );
-  }
-
   const fillId = `sil-fill-${option.id}`;
   const maskId = `sil-mask-${option.id}`;
 

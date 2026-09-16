@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Casting } from "@/lib/cast";
 import type {
   ResultsVisibility,
   Show,
@@ -32,6 +33,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Llegó a la mansión antes de que nadie lo llamara, y conoce cada pasillo demasiado bien. ¿Quién investiga al que investiga?",
     color: "#3b82f6",
     imageUrl: null,
+    castId: null,
     sortOrder: 1,
   },
   {
@@ -42,6 +44,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Tiene la llave de todas las puertas y escuchó todas las conversaciones. Nadie mira a quien sirve el té.",
     color: "#10b981",
     imageUrl: null,
+    castId: null,
     sortOrder: 2,
   },
   {
@@ -52,6 +55,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Manejaba cada negocio, cada deuda y cada secreto de Emily. Ser imprescindible también es un motivo.",
     color: "#f59e0b",
     imageUrl: null,
+    castId: null,
     sortOrder: 3,
   },
   {
@@ -62,6 +66,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Entró a la familia por la puerta grande y todavía lo miran como a un extraño. Tenía todo por ganar y nada que perder.",
     color: "#8b5cf6",
     imageUrl: null,
+    castId: null,
     sortOrder: 4,
   },
   {
@@ -72,6 +77,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Se casó con el apellido y aprendió a soportar lo que venía con él. Esa noche dejó de sonreír.",
     color: "#e11d48",
     imageUrl: null,
+    castId: null,
     sortOrder: 5,
   },
   {
@@ -82,6 +88,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Emily la levantó de la nada y la sentó en una mesa donde nadie la quería. La gratitud también tiene fecha de vencimiento.",
     color: "#22d3ee",
     imageUrl: null,
+    castId: null,
     sortOrder: 6,
   },
   {
@@ -92,6 +99,7 @@ export const DEMO_OPTIONS: VoteOption[] = [
       "Siempre segundo, siempre después. Esperó su turno toda la vida y esa noche se le acabó la paciencia.",
     color: "#f472b6",
     imageUrl: null,
+    castId: null,
     sortOrder: 7,
   },
 ];
@@ -120,6 +128,7 @@ function seedShow(): DemoShow {
     status: "open",
     resultsVisibility: "hidden",
     winnerOptionId: null,
+    casting: {},
     createdAt: new Date().toISOString(),
     openedAt: new Date().toISOString(),
     closedAt: null,
@@ -197,7 +206,7 @@ export function demoHistory() {
 
 // --------------------------------------------------------------- mutaciones
 
-export function demoCreateShow(name: string) {
+export function demoCreateShow(name: string, casting: Casting) {
   const state = store();
   if (state.live) return { error: "Ya hay una función activa." };
 
@@ -207,6 +216,7 @@ export function demoCreateShow(name: string) {
     status: "idle",
     resultsVisibility: "hidden",
     winnerOptionId: null,
+    casting,
     createdAt: new Date().toISOString(),
     openedAt: null,
     closedAt: null,
@@ -235,6 +245,14 @@ export function demoSetVisibility(visibility: ResultsVisibility) {
   if (!live) return { error: "No hay ninguna función activa." };
 
   live.resultsVisibility = visibility;
+  return {};
+}
+
+export function demoSetCasting(casting: Casting) {
+  const { live } = store();
+  if (!live) return { error: "No hay ninguna función activa." };
+
+  live.casting = casting;
   return {};
 }
 

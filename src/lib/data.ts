@@ -1,5 +1,6 @@
 import "server-only";
 
+import { applyCasting } from "@/lib/cast";
 import {
   demoDeviceVote,
   demoLiveShow,
@@ -32,6 +33,7 @@ interface ShowRow {
   status: Show["status"];
   results_visibility: Show["resultsVisibility"];
   winner_option_id: string | null;
+  casting: Record<string, string> | null;
   created_at: string;
   opened_at: string | null;
   closed_at: string | null;
@@ -50,6 +52,7 @@ export function mapOption(row: OptionRow): VoteOption {
     blurb: row.blurb,
     color: row.color,
     imageUrl: row.image_url,
+    castId: null,
     sortOrder: row.sort_order,
   };
 }
@@ -61,6 +64,7 @@ export function mapShow(row: ShowRow): Show {
     status: row.status,
     resultsVisibility: row.results_visibility,
     winnerOptionId: row.winner_option_id,
+    casting: row.casting ?? {},
     createdAt: row.created_at,
     openedAt: row.opened_at,
     closedAt: row.closed_at,
@@ -138,16 +142,21 @@ export async function getDeviceVote(
  * Los conteos se omiten (null) cuando la configuracion de la funcion todavia no
  * permite mostrarlos — el filtro vive en el servidor a proposito, para que no se
  * puedan espiar desde devtools.
+ *
+ * Las opciones salen con el identikit del elenco de ESTA funcion: `options`
+ * puede venir crudo de la base, aca se le aplica `show.casting`.
  */
 export async function composePublicState({
   show,
-  options,
+  options: rawOptions,
   myVote,
 }: {
   show: Show | null;
   options: VoteOption[];
   myVote: string | null;
 }): Promise<PublicState> {
+  const options = applyCasting(rawOptions, show?.casting ?? {});
+
   if (!show) {
     return { show: null, options, tallies: null, total: null, myVote: null };
   }
@@ -170,9 +179,7 @@ export async function composePublicState({
 export async function getPublicState(deviceId: string | null): Promise<PublicState> {
   const [options, show] = await Promise.all([getOptions(), getLiveShow()]);
 
-  if (!show) {
-    return { show: null, options, tallies: null, total: null, myVote: null };
-  }
+  if (!show) return composePublicState({ show: null, options, myVote: null });
 
   const myVote = await getDeviceVote(show.id, deviceId);
   return composePublicState({ show, options, myVote });

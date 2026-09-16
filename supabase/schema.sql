@@ -32,6 +32,12 @@ create table if not exists public.options (
 --   after_vote -> ve los conteos recien despues de emitir su voto
 --   hidden     -> no ve conteos hasta que el admin cierra la votacion (default:
 --                 nadie puede ver los votos ajenos mientras se vota)
+--
+-- casting (quien interpreta a cada personaje ESTA funcion):
+--   `{ "maid": "b", "mary": "b" }` -> option_id a id de actor. Los actores
+--   posibles de cada personaje, y el identikit de cada uno, viven en el codigo
+--   (src/lib/cast.ts): la base solo guarda cual se eligio. Vacio = el elenco
+--   por defecto para todos. Se elige al crear la funcion desde el panel.
 create table if not exists public.shows (
   id                 uuid primary key default gen_random_uuid(),
   name               text not null,
@@ -40,6 +46,8 @@ create table if not exists public.shows (
   results_visibility text not null default 'hidden'
                        check (results_visibility in ('live', 'after_vote', 'hidden')),
   winner_option_id   text references public.options (id) on delete set null,
+  casting            jsonb not null default '{}'::jsonb
+                       check (jsonb_typeof(casting) = 'object'),
   created_at         timestamptz not null default now(),
   opened_at          timestamptz,
   closed_at          timestamptz,
@@ -268,6 +276,12 @@ update public.shows
    set results_visibility = 'hidden'
  where status = 'idle'
    and results_visibility <> 'hidden';
+
+-- El elenco por funcion llego despues de las primeras funciones reales. Una
+-- base vieja no tiene la columna; se agrega vacia, que significa "elenco por
+-- defecto", que es lo que esas funciones tuvieron.
+alter table public.shows
+  add column if not exists casting jsonb not null default '{}'::jsonb;
 
 -- Las filas de conteo se siembran con un trigger al CREAR la funcion, asi que
 -- una funcion que ya existia no tiene fila para los sospechosos nuevos. Sin

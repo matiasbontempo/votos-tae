@@ -7,7 +7,8 @@
     "demo": "DEMO_MODE=1 ADMIN_PASSWORD=demo AUTH_SECRET=demo-secret-solo-para-probar-en-local next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "identikits": "node scripts/identikits.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

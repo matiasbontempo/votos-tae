@@ -32,7 +32,10 @@ export interface VoteOption {
   subtitle: string | null;
   blurb: string | null;
   color: string;
+  /** Identikit ya resuelto para la funcion actual (ver `applyCasting`). */
   imageUrl: string | null;
+  /** Que actor lo interpreta en la funcion actual; null si no hay elenco definido. */
+  castId: string | null;
   sortOrder: number;
 }
 
@@ -42,6 +45,8 @@ export interface Show {
   status: ShowStatus;
   resultsVisibility: ResultsVisibility;
   winnerOptionId: string | null;
+  /** Que actor hace cada personaje esta noche: `{ optionId: castId }`. */
+  casting: Record<string, string>;
   createdAt: string;
   openedAt: string | null;
   closedAt: string | null;

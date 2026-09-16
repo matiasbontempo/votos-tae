@@ -9,11 +9,13 @@ import {
   requireAdmin,
   startAdminSession,
 } from "@/lib/auth";
+import { castingFromForm, normalizeCasting, type Casting } from "@/lib/cast";
 import { VOTE_PATH } from "@/lib/constants";
 import { getLiveShow } from "@/lib/data";
 import {
   demoCreateShow,
   demoResetVotes,
+  demoSetCasting,
   demoSetStatus,
   demoSetVisibility,
   demoSetWinner,
@@ -60,6 +62,10 @@ export async function logoutAction(): Promise<void> {
  * Crea la funcion del dia. El indice parcial `shows_single_live` garantiza que
  * no puedan convivir dos: si quedo una abierta de la funcion anterior, el
  * insert falla y avisamos en vez de dejar dos funciones compitiendo.
+ *
+ * El elenco de la noche viaja en el mismo formulario (un campo por personaje
+ * con mas de un actor, ver `castingFromForm`): asi el identikit correcto esta
+ * en pantalla desde antes de abrir la votacion, sin un segundo paso.
  */
 export async function createShowAction(
   _prev: ActionResult,
@@ -69,10 +75,11 @@ export async function createShowAction(
 
   const raw = String(formData.get("name") ?? "").trim();
   const name = raw || defaultShowName();
+  const casting = castingFromForm(formData);
 
-  if (isDemo()) return finish(demoCreateShow(name));
+  if (isDemo()) return finish(demoCreateShow(name, casting));
 
-  const { error } = await supabaseAdmin().from("shows").insert({ name });
+  const { error } = await supabaseAdmin().from("shows").insert({ name, casting });
 
   if (error) {
     return fail(
@@ -157,6 +164,24 @@ export async function setVisibilityAction(
   if (!show) return fail("No hay ninguna función activa.");
 
   return updateShow(show.id, { results_visibility: visibility });
+}
+
+/**
+ * Cambia quien interpreta a un personaje en la funcion actual. Esta para
+ * corregir una eleccion equivocada al crear la funcion sin tener que
+ * finalizarla: cambia el identikit que ve el publico, no toca los votos.
+ */
+export async function setCastingAction(casting: Casting): Promise<ActionResult> {
+  await requireAdmin();
+
+  const clean = normalizeCasting(casting);
+
+  if (isDemo()) return finish(demoSetCasting(clean));
+
+  const show = await getLiveShow();
+  if (!show) return fail("No hay ninguna función activa.");
+
+  return updateShow(show.id, { casting: clean });
 }
 
 /**

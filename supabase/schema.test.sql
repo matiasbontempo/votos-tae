@@ -26,6 +26,25 @@ select check_eq('arrancan en cero', (select sum(count)::int from tallies
 select check_eq('visibilidad por defecto', (select results_visibility from shows
   where id='11111111-1111-1111-1111-111111111111'), 'hidden');
 
+-- Sin elegir elenco, la funcion arranca con el elenco por defecto (objeto vacio).
+select check_eq('elenco por defecto', (select casting::text from shows
+  where id='11111111-1111-1111-1111-111111111111'), '{}');
+
+-- El elenco se guarda como objeto; cualquier otra forma se rechaza.
+update shows set casting = '{"maid": "b"}'
+  where id='11111111-1111-1111-1111-111111111111';
+select check_eq('elenco elegido', (select casting->>'maid' from shows
+  where id='11111111-1111-1111-1111-111111111111'), 'b');
+
+do $$
+begin
+  update shows set casting = '["maid"]'
+    where id='11111111-1111-1111-1111-111111111111';
+  raise exception 'FAIL  se acepto un elenco que no es objeto';
+exception when check_violation then
+  raise notice 'PASS  elenco invalido rechazado';
+end $$;
+
 -- ===========================================================================
 -- 2. Una sola funcion viva a la vez
 -- ===========================================================================

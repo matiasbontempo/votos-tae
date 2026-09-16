@@ -1,7 +1,7 @@
 "use client";
 
 import { ConfirmBar } from "@/components/vote/ConfirmBar";
-import { Silhouette } from "@/components/vote/Silhouette";
+import { Identikit } from "@/components/vote/Identikit";
 import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import type { VariantProps } from "@/components/vote/variants/types";
 
@@ -77,7 +77,7 @@ export function GridVariant({
                 }`}
                 style={{ opacity: isSelected ? 1 : 0.62 }}
               >
-                <Silhouette option={option} index={i} />
+                <Identikit option={option} index={i} />
               </div>
 
               <div

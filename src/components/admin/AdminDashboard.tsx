@@ -11,11 +11,13 @@ import {
   openVotingAction,
   reopenVotingAction,
   resetVotesAction,
+  setCastingAction,
   setVisibilityAction,
   setWinnerAction,
   type ActionResult,
 } from "@/lib/actions";
 import type { AdminState } from "@/lib/admin-data";
+import { CHARACTERS, castMemberFor, recastableOptions } from "@/lib/cast";
 import { VOTE_PATH } from "@/lib/constants";
 import {
   VISIBILITY_HINTS,
@@ -24,6 +26,7 @@ import {
   VOTE_UIS,
   type ResultsVisibility,
   type ShowStatus,
+  type VoteOption,
 } from "@/lib/types";
 
 const POLL_MS = 2_000;
@@ -133,7 +136,7 @@ export function AdminDashboard({ initialState }: { initialState: AdminState }) {
         )}
 
         {!show ? (
-          <NewShowCard />
+          <NewShowCard options={options} />
         ) : (
           <div className="space-y-4">
             <Card title="Control de votación">
@@ -215,6 +218,29 @@ export function AdminDashboard({ initialState }: { initialState: AdminState }) {
                 })}
               </div>
             </Card>
+
+            {recastableOptions(options).length > 0 && (
+              <Card
+                title="Elenco de hoy"
+                hint="Cambia el identikit que ve el público. Los votos no se tocan."
+              >
+                <div className="space-y-3">
+                  {recastableOptions(options).map((option) => (
+                    <CastPicker
+                      key={option.id}
+                      option={option}
+                      value={castMemberFor(option.id, show.casting)?.id ?? null}
+                      disabled={pending}
+                      onChange={(castId) =>
+                        run(() =>
+                          setCastingAction({ ...show.casting, [option.id]: castId }),
+                        )
+                      }
+                    />
+                  ))}
+                </div>
+              </Card>
+            )}
 
             <Card
               title="Votos"
@@ -379,8 +405,9 @@ export function AdminDashboard({ initialState }: { initialState: AdminState }) {
 
 // ------------------------------------------------------------------- piezas
 
-function NewShowCard() {
+function NewShowCard({ options }: { options: VoteOption[] }) {
   const [result, formAction, pending] = useActionState(createShowAction, {});
+  const recastable = recastableOptions(options);
 
   return (
     <Card
@@ -394,6 +421,25 @@ function NewShowCard() {
           placeholder="Ej: Sábado 21h"
           className="focus:border-brass w-full rounded-xl border border-white/12 bg-white/5 px-4 py-3 text-sm outline-none"
         />
+
+        {/* Solo los personajes con mas de un actor. Los radios llegan al
+            server action como `cast:<optionId>`; ver castingFromForm. */}
+        {recastable.length > 0 && (
+          <fieldset className="space-y-3 rounded-xl border border-white/8 bg-white/3 p-3">
+            <legend className="text-muted px-1 text-[11px] font-semibold tracking-[0.2em] uppercase">
+              Elenco de hoy
+            </legend>
+            {recastable.map((option) => (
+              <CastPicker
+                key={option.id}
+                option={option}
+                name={`cast:${option.id}`}
+                disabled={pending}
+              />
+            ))}
+          </fieldset>
+        )}
+
         {result.error && (
           <p role="alert" className="text-sm text-red-300">
             {result.error}
@@ -408,6 +454,85 @@ function NewShowCard() {
         </button>
       </form>
     </Card>
+  );
+}
+
+/**
+ * Quien hace a un personaje esta noche. Con `name` es un grupo de radios
+ * dentro de un formulario (crear funcion); con `value` + `onChange` es un
+ * control vivo que dispara una action (corregir el elenco ya creada).
+ */
+function CastPicker({
+  option,
+  name,
+  value,
+  disabled,
+  onChange,
+}: {
+  option: VoteOption;
+  name?: string;
+  value?: string | null;
+  disabled?: boolean;
+  onChange?: (castId: string) => void;
+}) {
+  const cast = CHARACTERS[option.id]?.cast ?? [];
+  const controlled = onChange !== undefined;
+
+  return (
+    <div>
+      <p className="mb-1.5 flex items-center gap-2 text-sm">
+        <span
+          className="h-2 w-2 shrink-0 rounded-full"
+          style={{ backgroundColor: option.color }}
+        />
+        {option.name}
+      </p>
+      <div
+        className="grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${cast.length}, minmax(0, 1fr))` }}
+      >
+        {cast.map((member, i) => {
+          const active = controlled ? value === member.id : undefined;
+          const className = `h-11 truncate rounded-xl border px-2 text-xs font-medium transition-colors ${
+            active
+              ? "border-brass bg-brass/15 text-brass-soft"
+              : "text-muted hover:text-parchment border-white/10 bg-white/4"
+          }`;
+
+          if (controlled) {
+            return (
+              <button
+                key={member.id}
+                type="button"
+                disabled={disabled}
+                aria-pressed={active}
+                onClick={() => !active && onChange(member.id)}
+                className={className}
+              >
+                {member.label}
+              </button>
+            );
+          }
+
+          return (
+            <label
+              key={member.id}
+              className={`${className} has-checked:border-brass has-checked:bg-brass/15 has-checked:text-brass-soft flex cursor-pointer items-center justify-center`}
+            >
+              <input
+                type="radio"
+                name={name}
+                value={member.id}
+                defaultChecked={i === 0}
+                disabled={disabled}
+                className="sr-only"
+              />
+              <span className="truncate">{member.label}</span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

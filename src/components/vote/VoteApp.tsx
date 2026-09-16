@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ResultsBars } from "@/components/vote/ResultsBars";
-import { Silhouette } from "@/components/vote/Silhouette";
+import { Identikit } from "@/components/vote/Identikit";
 import { TitleEyebrow } from "@/components/vote/TitleEyebrow";
 import { GridVariant } from "@/components/vote/variants/GridVariant";
 import { StackVariant } from "@/components/vote/variants/StackVariant";
@@ -255,7 +255,7 @@ export function VoteApp({
       >
         {voted && (
           <div className="mx-auto mt-6 h-40 w-32">
-            <Silhouette
+            <Identikit
               option={voted}
               index={options.findIndex((o) => o.id === voted.id)}
             />
