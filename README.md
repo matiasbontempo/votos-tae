@@ -161,8 +161,8 @@ página.
 ## Identikits y elenco
 
 Cada sospechoso se muestra como un identikit dibujado (`Identikit.tsx`): el
-dibujo sobre un halo del color del personaje, con las anotaciones de un
-expediente al margen. Mientras falte el archivo de alguno, esa tarjeta muestra
+dibujo sobre un halo del color del personaje, con una huella dactilar de fondo
+como marca de agua. Mientras falte el archivo de alguno, esa tarjeta muestra
 la silueta dibujada por código, así que se puede ir cargando de a uno.
 
 ### Cargar los dibujos

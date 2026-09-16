@@ -5,7 +5,7 @@ import type { VoteOption } from "@/lib/types";
  *
  * Los personajes (nombre, bajada, parrafo, color) viven en la base, en
  * `options`. Lo que vive aca es lo que cambia con quien los interpreta: el
- * identikit que ve el publico, y las notas manuscritas del margen de la ficha.
+ * identikit que ve el publico.
  *
  * Cada personaje tiene una lista de actores posibles. Casi todos tienen uno
  * solo; Lady Maid y Mary Caissings tienen dos, porque en algunas fechas los
@@ -27,44 +27,35 @@ export interface CastMember {
 }
 
 export interface Character {
-  /** Notas manuscritas al margen de la ficha. Tres, cortas, una por linea. */
-  traits: string[];
   cast: CastMember[];
 }
 
 export const CHARACTERS: Record<string, Character> = {
   noah: {
-    traits: ["Observador.", "Reservado.", "Siempre presente."],
     cast: [{ id: "a", label: "Elenco titular", identikit: "noah.webp" }],
   },
   maid: {
-    traits: ["Discreta.", "Escucha todo.", "Nadie la mira."],
     cast: [
       { id: "a", label: "Elenco A", identikit: "maid-a.webp" },
       { id: "b", label: "Elenco B", identikit: "maid-b.webp" },
     ],
   },
   liam: {
-    traits: ["Eficiente.", "Imprescindible.", "Sabe demasiado."],
     cast: [{ id: "a", label: "Elenco titular", identikit: "liam.webp" }],
   },
   james: {
-    traits: ["Recién llegado.", "Ambicioso.", "Nada que perder."],
     cast: [{ id: "a", label: "Elenco titular", identikit: "james.webp" }],
   },
   mary: {
-    traits: ["Paciente.", "Cansada.", "Dejó de sonreír."],
     cast: [
       { id: "a", label: "Elenco A", identikit: "mary-a.webp" },
       { id: "b", label: "Elenco B", identikit: "mary-b.webp" },
     ],
   },
   cinthia: {
-    traits: ["Agradecida.", "Fuera de lugar.", "Hasta cuándo."],
     cast: [{ id: "a", label: "Elenco titular", identikit: "cinthia.webp" }],
   },
   lawrence: {
-    traits: ["Segundo.", "Impaciente.", "Esperó toda la vida."],
     cast: [{ id: "a", label: "Elenco titular", identikit: "lawrence.webp" }],
   },
 };

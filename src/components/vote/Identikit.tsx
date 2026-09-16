@@ -1,21 +1,13 @@
 "use client";
 
-import { Caveat } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
 
 import { Silhouette } from "@/components/vote/Silhouette";
-import { CHARACTERS } from "@/lib/cast";
 import type { VoteOption } from "@/lib/types";
 
 /**
- * Letra manuscrita para las notas del margen. Se descarga en el build y se
- * sirve desde el mismo dominio, asi que en la sala no hay una request extra.
- */
-const handwriting = Caveat({ subsets: ["latin"], weight: "500" });
-
-/**
  * La ficha policial de un sospechoso: el identikit dibujado, sobre un halo del
- * color del personaje y con las anotaciones de un expediente al margen.
+ * color del personaje y con una huella dactilar de fondo.
  *
  * `option.imageUrl` ya viene resuelto para el elenco de la funcion (ver
  * `applyCasting`). Si no hay imagen, o el archivo todavia no esta en
@@ -24,8 +16,11 @@ const handwriting = Caveat({ subsets: ["latin"], weight: "500" });
  * invisible hasta que termina de cargar, para que un 404 nunca muestre el
  * icono de imagen rota ni el texto alternativo.
  *
- * `frame` suma las anotaciones (numero de expediente, mansion, rasgos). Va en
- * las variantes de un sospechoso por pantalla; en la grilla no hay lugar.
+ * `frame` suma la huella dactilar de fondo. Va en las variantes de un
+ * sospechoso por pantalla; en la grilla no hay lugar. Antes tambien ponia
+ * anotaciones de expediente alrededor del dibujo (numero, rasgos a mano), y
+ * se sacaron: en un celular el dibujo necesita todo el ancho, y cualquier
+ * texto al costado termina pisandolo y pisado por el.
  */
 export function Identikit({
   option,
@@ -58,7 +53,6 @@ export function Identikit({
   }, [option.imageUrl]);
 
   const src = broken ? null : option.imageUrl;
-  const traits = CHARACTERS[option.id]?.traits ?? [];
 
   return (
     <div className={`relative h-full w-full ${className}`}>
@@ -74,36 +68,7 @@ export function Identikit({
         />
       )}
 
-      {frame && src && loaded && (
-        <>
-          <Fingerprint color={option.color} />
-
-          <div
-            aria-hidden
-            className="text-muted/70 pointer-events-none absolute top-[7%] right-0 text-right text-[10px] leading-loose tracking-[0.2em] uppercase"
-          >
-            <p className="border-t border-white/12 pt-1">
-              Exp. {String(index + 1).padStart(2, "0")}
-            </p>
-            <p className="border-b border-white/12 pb-1">
-              Mansión
-              <br />
-              Greenstout
-            </p>
-          </div>
-
-          {traits.length > 0 && (
-            <ul
-              aria-hidden
-              className={`${handwriting.className} text-parchment/60 pointer-events-none absolute top-[28%] left-0 -rotate-6 text-xl leading-tight`}
-            >
-              {traits.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+      {frame && src && loaded && <Fingerprint color={option.color} seed={index} />}
 
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element -- archivo estatico ya optimizado en public/, no hace falta el optimizador
@@ -126,25 +91,56 @@ export function Identikit({
   );
 }
 
-/** Huella dactilar apenas insinuada en el fondo de la ficha. */
-function Fingerprint({ color }: { color: string }) {
+/**
+ * Huella dactilar de fondo, como marca de agua de la ficha.
+ *
+ * Es un SVG con filtros, no una imagen: cero requests. Lo que la hace parecer
+ * una huella y no un target de tiro son dos cosas: las elipses concentricas
+ * se deforman con ruido fractal (feDisplacementMap), asi ninguna cresta es
+ * una curva perfecta; y un segundo ruido, mas fino, borra tramos al azar, que
+ * es lo que leen los ojos como terminaciones y bifurcaciones. Cada elipse va
+ * un poco mas abajo que la anterior, para que el conjunto se abra hacia abajo
+ * como un lazo y no como un remolino perfecto.
+ *
+ * `seed` cambia la deformacion: cada sospechoso tiene una huella distinta.
+ * Tambien evita ids de filtro repetidos cuando hay siete fichas en la misma
+ * pagina.
+ */
+function Fingerprint({ color, seed }: { color: string; seed: number }) {
+  const id = `huella-${seed}`;
+  const ridges = Array.from({ length: 17 }, (_, i) => 3 + i * 3.1);
+
   return (
     <svg
       aria-hidden
-      viewBox="0 0 100 100"
-      className="pointer-events-none absolute top-[4%] -left-[14%] w-[40%] opacity-[0.07]"
+      viewBox="0 0 100 120"
+      className="pointer-events-none absolute top-[1%] -left-[10%] w-[54%] opacity-[0.11]"
       fill="none"
       stroke={color}
-      strokeWidth="1.6"
+      strokeWidth="1.15"
       strokeLinecap="round"
     >
-      {[10, 18, 26, 34, 42].map((r) => (
-        <path
-          key={r}
-          d={`M ${50 - r} 58 A ${r} ${r * 1.15} 0 1 1 ${50 + r} 58`}
-          strokeDasharray={`${r * 1.4} ${r * 0.35}`}
-        />
-      ))}
+      <defs>
+        <filter id={id} x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed={seed * 7 + 1} result="warp" />
+          <feDisplacementMap in="SourceGraphic" in2="warp" scale="10" xChannelSelector="R" yChannelSelector="G" result="ridges" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.22" numOctaves="2" seed={seed * 7 + 4} result="fine" />
+          <feColorMatrix in="fine" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 11 -4.6" result="cut" />
+          <feComposite in="ridges" in2="cut" operator="in" />
+        </filter>
+        <radialGradient id={`${id}-fade`} cx="50%" cy="52%" r="50%">
+          <stop offset="55%" stopColor="#fff" />
+          <stop offset="100%" stopColor="#000" />
+        </radialGradient>
+        <mask id={`${id}-tip`}>
+          <ellipse cx="50" cy="60" rx="46" ry="58" fill={`url(#${id}-fade)`} />
+        </mask>
+      </defs>
+      <g filter={`url(#${id})`} mask={`url(#${id}-tip)`}>
+        {ridges.map((r) => (
+          <ellipse key={r} cx="50" cy={58 + r * 0.22} rx={r} ry={r * 1.28} />
+        ))}
+      </g>
     </svg>
   );
 }
