@@ -1,0 +1,1206 @@
+/* ==========================================================================
+   Landing de la obra.
+
+   Vive aparte de globals.css a proposito: la app de votacion es noir (bronce
+   y terciopelo, a oscuras en la sala) y la landing es pop de los setenta, con
+   la paleta del flyer. Nada de aca se aplica fuera de `.landing`, y /votar y
+   /admin no cambian un byte.
+   ========================================================================== */
+
+.landing {
+  /* Paleta del flyer. Negro siempre de fondo, tiza para leer, y cada color
+     con un trabajo: teal el caso, rosa los sospechosos, coral la funcion. */
+  --ink: #0f0d0b;
+  --ink-2: #17130f;
+  --chalk: #f2e8d3;
+  --chalk-70: rgba(242, 232, 211, 0.72);
+  --chalk-50: rgba(242, 232, 211, 0.5);
+  --line: rgba(242, 232, 211, 0.14);
+  --teal: #33a58b;
+  --rosa: #e6497f;
+  --coral: #ef5d3a;
+  --mostaza: #f2b93f;
+  --purpura: #5e2b7d;
+
+  --display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --text: var(--font-bricolage), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --gutter: clamp(16px, 5vw, 48px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: relative;
+  min-height: 100svh;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--chalk);
+  font-family: var(--text);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Grano de pelicula: la misma receta que `.stage-bg::after` en la app de
+   votacion. Es lo unico que las dos pantallas comparten a la vista, ademas de
+   los identikits. */
+.landing > main,
+.landing > .foot {
+  position: relative;
+  z-index: 1;
+}
+
+.landing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Sin color de link por defecto, pero con `:where()` para que no le gane a
+   ningun componente: los botones, los marcadores y los logos son <a> y cada
+   uno pone su color. Con `.landing a` a secas (0,1,1) el boton de entradas
+   quedaba con texto color tiza sobre fondo color tiza. */
+:where(.landing a) {
+  color: inherit;
+}
+
+.landing :focus-visible {
+  outline: 2px solid var(--mostaza);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: min(100% - 2 * var(--gutter), 1120px);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--chalk-70);
+}
+
+/* Fraunces con SOFT a fondo: el redondeo Cooper de los setenta que el flyer
+   usa en los horarios. */
+.display {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 100;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.h2 {
+  font-size: clamp(2rem, 5.6vw, 3.8rem);
+}
+
+/* --------------------------------------------------------------------------
+   Botones
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    transform 0.2s var(--ease-out),
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Las cuatro franjas del flyer aparecen una sola vez en la pagina: alrededor
+   del boton de entradas. Es un borde con dos fondos, sin pseudoelementos. */
+.btn-primary {
+  color: var(--ink);
+  border: 4px solid transparent;
+  background:
+    linear-gradient(var(--chalk), var(--chalk)) padding-box,
+    linear-gradient(90deg, var(--teal) 0 25%, var(--rosa) 0 50%, var(--coral) 0 75%, var(--mostaza) 0) border-box;
+}
+
+.btn-primary:hover {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(90deg, var(--teal) 0 25%, var(--rosa) 0 50%, var(--coral) 0 75%, var(--mostaza) 0) border-box;
+}
+
+.btn-ghost {
+  color: var(--chalk);
+  border: 1.5px solid var(--line);
+  background: transparent;
+}
+
+.btn-ghost:hover {
+  border-color: var(--chalk-50);
+}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  display: grid;
+  justify-items: center;
+  gap: clamp(18px, 3vw, 28px);
+  padding-block: clamp(36px, 7vw, 72px) 0;
+  text-align: center;
+}
+
+/* La entrada del hero es en cascada y arranca sola al cargar: es lo unico que
+   se mueve sin que el visitante haga nada. El lettering tiene la suya (.wm). */
+.hero > :not(.wordmark) {
+  animation: rise 0.7s var(--ease-out) both;
+}
+
+.hero > :nth-child(1) { animation-delay: 0.05s; }
+.hero > :nth-child(3) { animation-delay: 0.42s; }
+.hero > :nth-child(4) { animation-delay: 0.52s; }
+.hero > :nth-child(5) { animation-delay: 0.6s; }
+.hero > :nth-child(6) { animation-delay: 0.68s; }
+
+/* El lettering sube desde atras de su propia mascara, palabra por palabra. El
+   padding de abajo le deja lugar a la panza de la "g" y a la sombra dura; el
+   margen negativo devuelve ese espacio para que las tres lineas no se abran.
+   Esto es para el titulo compuesto, el de respaldo: son tres lineas y cada una
+   entra por separado. */
+.wm {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.wm > * {
+  display: block;
+  animation: wm-rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: inherit;
+}
+
+@keyframes wm-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+/* El lettering de verdad NO entra animado, y es a proposito.
+   
+   Es la imagen mas grande de la pantalla, o sea el elemento que mide el
+   navegador para decir cuando la pagina "cargo" (LCP). Escondido detras de la
+   mascara casi un segundo, no cuenta como pintado: medido, el LCP en celular
+   pasaba de 108 ms a 2056 ms, y encima el elemento que terminaba contando era
+   un titulo de mas abajo. Dos segundos de diferencia por un gesto de un
+   segundo no es un intercambio que convenga.
+
+   Aparece de una, y todo lo demas del hero se acomoda alrededor. El titulo no
+   necesita hacer una entrada: es la entrada. */
+.wordmark:not(.wordmark-text) {
+  overflow: visible;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.wordmark:not(.wordmark-text) > * {
+  animation: none;
+}
+
+.hero .sub {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 500;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: var(--chalk-70);
+}
+
+.hero .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 18px;
+}
+
+.hero .line {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--chalk-70);
+}
+
+/* El lettering del flyer. Cuando el archivo esta en public/landing/, es una
+   imagen; hasta entonces, el titulo se compone con la tipografia de la
+   pagina, a imitacion: tres palabras, tres colores, sombra dura. */
+.wordmark {
+  display: block;
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wordmark-text {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(3.2rem, 13vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-shadow:
+    0.035em 0.035em 0 #000,
+    0.07em 0.07em 0 #000;
+}
+
+.wordmark-text span {
+  display: block;
+}
+
+.wordmark-text .w1 { color: var(--teal); }
+.wordmark-text .w2 { color: var(--rosa); font-size: 0.5em; line-height: 1.15; }
+.wordmark-text .w3 { color: var(--coral); }
+
+/* Escena: el contorno de tiza con los tres marcadores encima. Los marcadores
+   son la navegacion de la pagina; el contorno es el motivo. */
+.scene {
+  position: relative;
+  width: min(100%, 880px);
+  margin: clamp(8px, 2vw, 20px) auto 0;
+}
+
+.scene svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chalk {
+  fill: none;
+  stroke: var(--chalk);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+
+.chalk .draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: chalk-draw 1.8s var(--ease-out) 0.35s forwards;
+}
+
+.chalk .draw-head {
+  animation-duration: 0.6s;
+  animation-delay: 0.2s;
+}
+
+@keyframes chalk-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* En celular los marcadores van en una fila debajo del contorno: encima, las
+   etiquetas caen sobre el dibujo y no se lee ni una cosa ni la otra. Desde
+   720px hay lugar para apoyarlos alrededor del cuerpo, como en la escena. */
+.markers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 28px;
+  margin-top: 8px;
+}
+
+@media (min-width: 720px) {
+  .scene {
+    padding-bottom: 72px;
+  }
+
+  .markers {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+  }
+
+  .scene .marker {
+    position: absolute;
+    transform: translate(-50%, -100%);
+  }
+}
+
+/* Los marcadores caen cuando el contorno ya se dibujo, con un rebote corto:
+   como si alguien los fuera apoyando en el piso. */
+.markers .tent {
+  animation: tent-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(1.5s + var(--i, 0) * 0.12s);
+}
+
+@keyframes tent-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@media (min-width: 720px) {
+  .markers .tent {
+    /* Con los marcadores apoyados sobre la escena, el desplazamiento de la
+       caida se suma al que ya los centra sobre su punto. */
+    animation-name: tent-drop-over;
+  }
+
+  @keyframes tent-drop-over {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 14px));
+    }
+  }
+}
+
+/* Marcador de evidencia: la carpita numerada de la escena del crimen. */
+.tent {
+  --c: var(--chalk);
+  display: inline-grid;
+  justify-items: center;
+  gap: 6px;
+  color: var(--chalk-70);
+  text-decoration: none;
+}
+
+.tent .n {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 42px;
+  clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+  background: var(--c);
+  color: var(--ink);
+  font-family: var(--text);
+  font-weight: 800;
+  font-size: 1.3rem;
+  line-height: 1;
+  transition: transform 0.25s var(--ease-out);
+}
+
+.tent .l {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+a.tent:hover .n,
+a.tent:focus-visible .n {
+  transform: translateY(-4px);
+}
+
+.tent.big .n {
+  width: 56px;
+  height: 50px;
+  font-size: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Secciones
+   -------------------------------------------------------------------------- */
+.section {
+  padding-block: clamp(56px, 9vw, 112px);
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 12px;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 22px;
+  margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.section-head .tent {
+  --c: var(--accent, var(--chalk));
+}
+
+.prose {
+  max-width: 62ch;
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  line-height: 1.6;
+}
+
+.prose p {
+  margin: 0 0 1em;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.claim {
+  max-width: 24ch;
+  margin-top: clamp(28px, 5vw, 48px);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 4.8vw, 3.3rem);
+  color: var(--accent, var(--chalk));
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--chalk-70);
+}
+
+.facts li::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+  background: var(--accent, var(--chalk));
+}
+
+/* --------------------------------------------------------------------------
+   Sospechosos: tira con snap en celular, grilla en pantallas grandes
+   -------------------------------------------------------------------------- */
+.suspects {
+  display: flex;
+  gap: 22px 18px;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 4px var(--gutter) 8px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.suspects::-webkit-scrollbar {
+  display: none;
+}
+
+.suspects > li {
+  flex: 0 0 min(62vw, 250px);
+  scroll-snap-align: center;
+}
+
+
+/* Cuatro por fila y no siete, aunque los siete entren: a siete la ficha queda
+   de 148px y un identikit a lapiz a ese tamaño se vuelve una mancha. A cuatro
+   mide 270 y se le ve la cara, que es el mejor material que tiene la obra.
+   Siete es primo, asi que la segunda fila va de tres, centrada. */
+@media (min-width: 720px) {
+  .suspects {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .suspects > li {
+    flex-basis: calc((100% - 3 * 18px) / 4);
+  }
+}
+
+.card {
+  --c: var(--chalk);
+  display: grid;
+  gap: 10px;
+  height: 100%;
+  text-align: center;
+}
+
+.card .pic {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--ink-2);
+}
+
+/* Halo del color del sospechoso, siempre, con dibujo o con silueta. */
+.card .halo {
+  position: absolute;
+  inset: 12% 10% 0;
+  border-radius: 45%;
+  background: radial-gradient(60% 55% at 50% 45%, color-mix(in srgb, var(--c) 42%, transparent), transparent 75%);
+  filter: blur(22px);
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+
+/* Al pasar por encima, la ficha se levanta y el halo sube con ella: la que se
+   mira se enciende, las otras se quedan en penumbra. No gira ni muestra nada
+   nuevo, porque atras no hay nada: la acusacion se lee en la sala. */
+.card .pic {
+  transition:
+    transform 0.35s var(--ease-out),
+    border-color 0.35s;
+}
+
+.suspects > li:hover .pic,
+.suspects > li:focus-within .pic {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.suspects > li:hover .halo,
+.suspects > li:focus-within .halo {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+@media (hover: hover) {
+  .suspects > li .halo {
+    opacity: 0.62;
+  }
+}
+
+.card .fig {
+  position: absolute;
+  inset: 8% 6% 0;
+}
+
+.card h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 600;
+  font-variation-settings: "SOFT" 100;
+  font-size: 1.2rem;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+/* El rol se apoya abajo de la ficha, no debajo del nombre: si un nombre se
+   parte en dos lineas, los roles de la fila siguen alineados entre si, y
+   cuando todos entran en una linea no queda ningun hueco reservado. */
+.card .role {
+  margin: auto 0 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+
+.suspects-close {
+  max-width: 34ch;
+  margin: clamp(24px, 4vw, 40px) auto 0;
+  font-family: var(--display);
+  font-weight: 500;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(1.25rem, 2.6vw, 1.7rem);
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--chalk-70);
+}
+
+/* --------------------------------------------------------------------------
+   La funcion
+   -------------------------------------------------------------------------- */
+.split {
+  display: grid;
+  align-items: start;
+  gap: clamp(28px, 5vw, 56px);
+}
+
+@media (min-width: 880px) {
+  .split {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+.hours {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.hours > div {
+  display: grid;
+  gap: 4px;
+}
+
+.hours .day {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--chalk-70);
+}
+
+.hours .t {
+  font-family: var(--display);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hours .t small {
+  margin-left: 0.12em;
+  font-size: 0.42em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--chalk-70);
+}
+
+.season {
+  margin: 22px 0 0;
+  font-size: 1.05rem;
+  color: var(--chalk-70);
+}
+
+.next {
+  margin: 10px 0 0;
+  font-family: var(--display);
+  font-weight: 500;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+  color: var(--mostaza);
+}
+
+.cta-block {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: clamp(24px, 4vw, 36px);
+}
+
+.cta-block .hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--chalk-50);
+}
+
+.venue {
+  display: grid;
+  gap: 16px;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--ink-2);
+}
+
+.venue h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 100;
+  font-size: 1.6rem;
+  line-height: 1.05;
+}
+
+.venue .addr {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.venue .note {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--chalk-70);
+}
+
+.venue .note strong {
+  font-weight: 600;
+  color: var(--chalk);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--chalk-50);
+  background: rgba(242, 232, 211, 0.05);
+}
+
+/* --------------------------------------------------------------------------
+   Elenco y equipo
+   -------------------------------------------------------------------------- */
+.tae {
+  max-width: 62ch;
+  margin: 0;
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  line-height: 1.6;
+}
+
+.frame {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  color: var(--chalk-50);
+}
+
+.names {
+  columns: 1;
+  column-gap: 32px;
+  margin: clamp(24px, 4vw, 36px) 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--display);
+  font-weight: 500;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  line-height: 1.35;
+}
+
+.names li {
+  break-inside: avoid;
+}
+
+@media (min-width: 560px) {
+  .names {
+    columns: 2;
+  }
+}
+
+@media (min-width: 880px) {
+  .names {
+    columns: 3;
+  }
+}
+
+.credits {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 20px;
+  max-width: 70ch;
+  margin: clamp(28px, 5vw, 48px) 0 0;
+  font-size: 0.95rem;
+}
+
+.credits dt {
+  padding-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chalk-50);
+}
+
+.credits dd {
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .credits {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+  }
+
+  .credits dd {
+    margin-bottom: 12px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Cierre
+   -------------------------------------------------------------------------- */
+.foot {
+  border-top: 1px solid var(--line);
+  padding-top: clamp(36px, 6vw, 56px);
+}
+
+.foot .wrap {
+  display: grid;
+  gap: 28px;
+  /* En celular, lugar para la barra fija con el boton. */
+  padding-bottom: clamp(96px, 14vw, 120px);
+}
+
+@media (min-width: 880px) {
+  .foot .wrap {
+    padding-bottom: clamp(36px, 6vw, 56px);
+  }
+}
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.logo {
+  font-family: var(--display);
+  font-weight: 700;
+  font-variation-settings: "SOFT" 100;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: var(--chalk-70);
+  text-decoration: none;
+}
+
+a.logo:hover {
+  color: var(--chalk);
+}
+
+.foot .meta {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--chalk-50);
+}
+
+.foot .meta p {
+  margin: 0;
+}
+
+.foot .meta a {
+  color: var(--chalk-70);
+  text-decoration-color: var(--chalk-50);
+}
+
+/* La tira violeta del flyer, fina, cerrando la pagina. */
+.strip {
+  height: 6px;
+  background: var(--purpura);
+}
+
+/* --------------------------------------------------------------------------
+   Barra fija con el boton, solo en celular y solo pasado el hero
+   -------------------------------------------------------------------------- */
+.sticky {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: rgba(15, 13, 11, 0.92);
+  backdrop-filter: blur(10px);
+  animation: sticky-in 0.3s var(--ease-out);
+}
+
+.sticky .btn {
+  width: min(100%, 420px);
+}
+
+.sticky[hidden] {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  .sticky {
+    display: none;
+  }
+}
+
+@keyframes sticky-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chalk .draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Capa de movimiento
+
+   Todo lo de aca abajo lo enciende `Motion.tsx`. Tres reglas que no se
+   rompen: sin JavaScript la pagina se ve entera igual (nada nace invisible a
+   menos que `data-js` este puesto, y eso lo pone un script antes de pintar);
+   solo se animan `transform` y `opacity`; y con `prefers-reduced-motion` todo
+   esto queda en su estado final.
+   -------------------------------------------------------------------------- */
+
+/* Aparecer al entrar en pantalla. Sin `data-js` la regla no existe y el
+   contenido se ve desde el primer frame, que es lo que ve un buscador o
+   alguien con el JavaScript bloqueado. */
+[data-js] .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.65s var(--ease-out),
+    transform 0.65s var(--ease-out);
+}
+
+[data-js] .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Las fichas de sospechosos entran en cascada, de izquierda a derecha. */
+[data-js] .suspects.in > li {
+  animation: rise 0.55s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Barra de progreso: las cuatro franjas del flyer llenandose a lo ancho del
+   borde de arriba. Es la segunda y ultima vez que aparecen en la pagina. */
+.progress {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 15;
+  height: 3px;
+  pointer-events: none;
+}
+
+.progress-fill {
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(
+    90deg,
+    var(--teal) 0 25%,
+    var(--rosa) 0 50%,
+    var(--coral) 0 75%,
+    var(--mostaza) 0
+  );
+}
+
+/* Linterna. Quieta respira en el centro; con mouse persigue al cursor con
+   retraso (la clase `live` la pone Motion al primer movimiento). */
+.spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: min(120vw, 1100px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  transform: translate3d(50vw, 38vh, 0) translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(242, 232, 211, 0.085),
+    rgba(242, 232, 211, 0.03) 45%,
+    transparent 70%
+  );
+  animation: breathe 9s ease-in-out infinite;
+}
+
+.spotlight.live {
+  animation: none;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Riel de marcadores: aparece al pasar el hero y dice en que seccion estas.
+   Solo donde sobra ancho; en pantallas angostas la barra de entradas ya ocupa
+   el unico lugar fijo que conviene gastar. */
+.rail {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  z-index: 15;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  transform: translate(-16px, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+
+.rail.up {
+  opacity: 1;
+  transform: translate(0, -50%);
+  pointer-events: auto;
+}
+
+/* 1280 y no menos: el contenido va centrado a 1120px de ancho, asi que recien
+   ahi el margen libre es mas ancho que el riel y no se le monta encima. */
+@media (min-width: 1280px) {
+  .rail {
+    display: flex;
+  }
+}
+
+.rail .tent .n {
+  width: 34px;
+  height: 31px;
+  font-size: 0.95rem;
+  background: var(--chalk-50);
+  transition:
+    background-color 0.3s,
+    transform 0.3s var(--ease-out);
+}
+
+.rail .tent.on .n {
+  background: var(--c);
+  transform: translateY(-2px);
+}
+
+/* Titulo de seccion: el marcador se enciende cuando la seccion esta a la
+   vista, igual que su par del riel. */
+.section-head .tent .n {
+  background: var(--chalk-50);
+  transition: background-color 0.4s;
+}
+
+.section.seen .section-head .tent .n {
+  background: var(--accent, var(--chalk));
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Tira de estreno
+   -------------------------------------------------------------------------- */
+.ticker {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding-block: 16px;
+  border-block: 1px solid var(--line);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.ticker .track {
+  display: flex;
+  width: max-content;
+  animation: ticker 42s linear infinite;
+}
+
+.ticker:hover .track {
+  animation-play-state: paused;
+}
+
+.ticker .run {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.ticker .bit {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-variation-settings: "SOFT" 100;
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+  white-space: nowrap;
+  color: var(--chalk-70);
+}
+
+.ticker .bit b {
+  font-family: var(--text);
+  font-size: 0.7em;
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sin movimiento: todo en su estado final, nada en bucle
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-js] .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-js] .suspects.in > li {
+    animation: none;
+  }
+
+  .spotlight,
+  .progress {
+    display: none;
+  }
+
+  .ticker .track {
+    animation: none;
+  }
+
+  .wm > * {
+    animation: none;
+  }
+}
