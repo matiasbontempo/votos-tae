@@ -27,9 +27,11 @@ Tres pantallas:
   papel sirve para todas las funciones.
 - **`/admin`** — backstage: abrir y cerrar la votación, ver los votos en vivo,
   resolver empates, finalizar la función, imprimir los QR.
-- **`/`** — la landing de la obra. Hoy es un placeholder con un link a votar;
-  se reemplaza por la página real (sinopsis, elenco, entradas) sin tocar nada
-  de la votación.
+- **`/`** — la landing de la obra: sinopsis, sospechosos, funciones, entradas
+  (link a Alternativa Teatral) y elenco. Todo lo que dice vive en
+  `src/lib/landing-content.ts`; el lettering del flyer va en
+  `public/landing/wordmark.png` (ver `public/landing/README.md`). No linkea a
+  la votación: la única puerta a `/votar` es el QR de la butaca.
 
 La ruta de votación vive en `VOTE_PATH` (`src/lib/constants.ts`), que es lo que
 usa el generador de QR: si algún día se mueve, el papel se genera solo con la

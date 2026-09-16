@@ -26,11 +26,14 @@ export function Identikit({
   option,
   index,
   frame = false,
+  halo = true,
   className = "",
 }: {
   option: VoteOption;
   index: number;
   frame?: boolean;
+  /** La landing dibuja su propio halo (siempre, con dibujo o silueta) y apaga este. */
+  halo?: boolean;
   className?: string;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -58,7 +61,7 @@ export function Identikit({
     <div className={`relative h-full w-full ${className}`}>
       {/* Halo del color del sospechoso, detras del dibujo. Se desvanece antes
           de llegar al borde para que el recorte del PNG no se note. */}
-      {src && loaded && (
+      {halo && src && loaded && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-[10%] top-[6%] bottom-[8%] rounded-[45%] blur-2xl"
@@ -131,7 +134,7 @@ const PLACEMENTS: {
   { top: "8%", side: "left", offset: "-8%", width: "55%", rotate: 33 },
 ];
 
-function Fingerprint({ color, seed }: { color: string; seed: number }) {
+export function Fingerprint({ color, seed }: { color: string; seed: number }) {
   const id = `huella-${seed}`;
   const ridges = Array.from({ length: 17 }, (_, i) => 3 + i * 3.1);
   const place = PLACEMENTS[seed % PLACEMENTS.length]!;
