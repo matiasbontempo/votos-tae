@@ -2,10 +2,12 @@ import { Cast } from "@/components/landing/Cast";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
 import { JsonLd } from "@/components/landing/JsonLd";
+import { Motion } from "@/components/landing/Motion";
 import { Schedule } from "@/components/landing/Schedule";
 import { StickyCta } from "@/components/landing/StickyCta";
 import { Suspects } from "@/components/landing/Suspects";
 import { TheCase } from "@/components/landing/TheCase";
+import { Ticker } from "@/components/landing/Ticker";
 import { TICKETS_URL, seasonPhase } from "@/lib/landing-content";
 
 /**
@@ -28,11 +30,13 @@ export default function LandingPage() {
         <Hero phase={phase} />
         <TheCase />
         <Suspects />
+        <Ticker />
         <Schedule phase={phase} />
         <Cast />
       </main>
       <Footer />
       {phase !== "over" && <StickyCta href={TICKETS_URL} label="Conseguí tu entrada" />}
+      <Motion />
       <JsonLd />
     </>
   );

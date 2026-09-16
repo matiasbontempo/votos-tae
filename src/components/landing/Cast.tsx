@@ -7,16 +7,16 @@ export function Cast() {
   return (
     <section className="section wrap" id="elenco" style={{ "--accent": "var(--mostaza)" } as CSSProperties}>
       <SectionHead title="Elenco y equipo" />
-      <p className="tae">{TAE_BLURB}</p>
+      <p className="tae reveal">{TAE_BLURB}</p>
       <p className="frame">
         {FRAME_LINE} Producción: {VENUE.fullName}.
       </p>
-      <ul className="names">
+      <ul className="names reveal">
         {CAST.map((name) => (
           <li key={name}>{name}</li>
         ))}
       </ul>
-      <dl className="credits">
+      <dl className="credits reveal">
         {CREDITS.map((c) => (
           <Fragment key={c.role}>
             <dt>{c.role}</dt>

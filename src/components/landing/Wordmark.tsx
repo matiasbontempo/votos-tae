@@ -47,7 +47,7 @@ export function Wordmark() {
 
   if (asset) {
     return (
-      <h1 className="wordmark">
+      <h1 className="wordmark wm">
         <Image
           src={asset.src}
           width={asset.width}
@@ -60,10 +60,20 @@ export function Wordmark() {
     );
   }
 
+  // Tres palabras, tres lineas, cada una detras de su propia mascara: suben
+  // escalonadas al cargar. Con el lettering de verdad sube la imagen entera,
+  // porque es un solo archivo.
   return (
     <h1 className="wordmark wordmark-text">
-      <span className="w1">Agravado</span> <span className="w2">por el</span>{" "}
-      <span className="w3">Vínculo</span>
+      {[
+        ["w1", "Agravado"],
+        ["w2", "por el"],
+        ["w3", "Vínculo"],
+      ].map(([cls, word], i) => (
+        <span key={cls} className="wm" style={{ animationDelay: `${i * 90}ms` }}>
+          <span className={cls}>{word}</span>
+        </span>
+      ))}
     </h1>
   );
 }

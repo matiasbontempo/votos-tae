@@ -58,6 +58,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * Marca el documento antes de que pinte, para que los bloques que aparecen al
+ * hacer scroll nazcan invisibles sin parpadeo. Sin JavaScript la marca nunca
+ * se pone y la pagina se ve entera: es lo que ve un buscador, o alguien con
+ * el JavaScript bloqueado.
+ *
+ * La red de seguridad importa mas que el efecto: si React no llega a
+ * hidratar, o el observer no corre, a los dos segundos se saca la marca y
+ * todo vuelve a ser visible. Una landing que estrena el sabado no puede
+ * quedarse en blanco porque fallo un script.
+ */
+const REVEAL_BOOT =
+  'document.documentElement.dataset.js="1";' +
+  'setTimeout(function(){' +
+  'if(!document.querySelector(".reveal.in"))delete document.documentElement.dataset.js;' +
+  "},2000)";
+
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
-  return <div className={`landing ${fraunces.variable} ${bricolage.variable}`}>{children}</div>;
+  return (
+    <div className={`landing ${fraunces.variable} ${bricolage.variable}`}>
+      <script dangerouslySetInnerHTML={{ __html: REVEAL_BOOT }} />
+      {children}
+    </div>
+  );
 }

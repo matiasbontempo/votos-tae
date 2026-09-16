@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 
+import { SECTIONS } from "@/lib/landing-content";
+
 /**
  * La escena del crimen: el contorno de tiza acostado y, encima, los tres
  * marcadores de evidencia. Los marcadores son la navegacion de la pagina,
@@ -12,10 +14,10 @@ import type { CSSProperties } from "react";
  * caen en espacio vacio, nunca sobre el trazo. En celular no se usan: los
  * marcadores van en fila debajo del dibujo (ver landing.css).
  */
-const MARKERS = [
-  { n: 1, label: "El caso", href: "#el-caso", color: "var(--teal)", left: "9%", top: "100%" },
-  { n: 2, label: "Los sospechosos", href: "#sospechosos", color: "var(--rosa)", left: "47%", top: "28%" },
-  { n: 3, label: "La función", href: "#la-funcion", color: "var(--coral)", left: "89%", top: "100%" },
+const SPOTS = [
+  { left: "9%", top: "100%" },
+  { left: "47%", top: "28%" },
+  { left: "89%", top: "100%" },
 ];
 
 /**
@@ -48,17 +50,23 @@ export function ChalkScene() {
       </svg>
 
       <nav className="markers" aria-label="Secciones de la página">
-        {MARKERS.map((m) => (
+        {SECTIONS.map((s, i) => (
           <a
-            key={m.n}
-            href={m.href}
+            key={s.id}
+            href={`#${s.id}`}
             className="tent marker"
-            style={{ left: m.left, top: m.top, "--c": m.color } as CSSProperties}
+            style={
+              {
+                ...SPOTS[i],
+                "--c": s.color,
+                "--i": i,
+              } as CSSProperties
+            }
           >
             <span className="n" aria-hidden="true">
-              {m.n}
+              {s.n}
             </span>
-            <span className="l">{m.label}</span>
+            <span className="l">{s.label}</span>
           </a>
         ))}
       </nav>

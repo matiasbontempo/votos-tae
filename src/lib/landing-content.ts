@@ -198,6 +198,17 @@ export const SUSPECTS: Suspect[] = SUSPECT_SEED.map((s) => ({
 
 export { identikitUrl };
 
+/**
+ * Las tres secciones que tienen marcador de evidencia: el orden en que se
+ * recorre la pagina, y lo que muestran el hero, el riel fijo y los titulos.
+ * Un solo lugar para que el numero, el color y el destino no se separen.
+ */
+export const SECTIONS = [
+  { n: 1, id: "el-caso", label: "El caso", color: "var(--teal)" },
+  { n: 2, id: "sospechosos", label: "Los sospechosos", color: "var(--rosa)" },
+  { n: 3, id: "la-funcion", label: "La función", color: "var(--coral)" },
+];
+
 export const SUSPECTS_TITLE = "Siete sospechosos. Una sola verdad.";
 
 export const SUSPECTS_CLOSE =

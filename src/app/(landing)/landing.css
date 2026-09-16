@@ -41,11 +41,17 @@
 /* Grano de pelicula: la misma receta que `.stage-bg::after` en la app de
    votacion. Es lo unico que las dos pantallas comparten a la vista, ademas de
    los identikits. */
+.landing > main,
+.landing > .foot {
+  position: relative;
+  z-index: 1;
+}
+
 .landing::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   opacity: 0.09;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -162,15 +168,39 @@
   text-align: center;
 }
 
-.hero > * {
+/* La entrada del hero es en cascada y arranca sola al cargar: es lo unico que
+   se mueve sin que el visitante haga nada. El lettering tiene la suya (.wm). */
+.hero > :not(.wordmark) {
   animation: rise 0.7s var(--ease-out) both;
 }
 
-.hero > :nth-child(2) { animation-delay: 0.06s; }
-.hero > :nth-child(3) { animation-delay: 0.12s; }
-.hero > :nth-child(4) { animation-delay: 0.18s; }
-.hero > :nth-child(5) { animation-delay: 0.24s; }
-.hero > :nth-child(6) { animation-delay: 0.3s; }
+.hero > :nth-child(1) { animation-delay: 0.05s; }
+.hero > :nth-child(3) { animation-delay: 0.42s; }
+.hero > :nth-child(4) { animation-delay: 0.52s; }
+.hero > :nth-child(5) { animation-delay: 0.6s; }
+.hero > :nth-child(6) { animation-delay: 0.68s; }
+
+/* El lettering sube desde atras de su propia mascara, palabra por palabra. El
+   padding de abajo le deja lugar a la panza de la "g" y a la sombra dura; el
+   margen negativo devuelve ese espacio para que las tres lineas no se abran. */
+.wm {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.wm > * {
+  display: block;
+  animation: wm-rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: inherit;
+}
+
+@keyframes wm-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
 
 .hero .sub {
   margin: 0;
@@ -298,6 +328,35 @@
   .scene .marker {
     position: absolute;
     transform: translate(-50%, -100%);
+  }
+}
+
+/* Los marcadores caen cuando el contorno ya se dibujo, con un rebote corto:
+   como si alguien los fuera apoyando en el piso. */
+.markers .tent {
+  animation: tent-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(1.5s + var(--i, 0) * 0.12s);
+}
+
+@keyframes tent-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@media (min-width: 720px) {
+  .markers .tent {
+    /* Con los marcadores apoyados sobre la escena, el desplazamiento de la
+       caida se suma al que ya los centra sobre su punto. */
+    animation-name: tent-drop-over;
+  }
+
+  @keyframes tent-drop-over {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 14px));
+    }
   }
 }
 
@@ -482,6 +541,36 @@ a.tent:focus-visible .n {
   background: radial-gradient(60% 55% at 50% 45%, color-mix(in srgb, var(--c) 42%, transparent), transparent 75%);
   filter: blur(22px);
   pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+
+/* Al pasar por encima, la ficha se levanta y el halo sube con ella: la que se
+   mira se enciende, las otras se quedan en penumbra. No gira ni muestra nada
+   nuevo, porque atras no hay nada: la acusacion se lee en la sala. */
+.card .pic {
+  transition:
+    transform 0.35s var(--ease-out),
+    border-color 0.35s;
+}
+
+.suspects > li:hover .pic,
+.suspects > li:focus-within .pic {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.suspects > li:hover .halo,
+.suspects > li:focus-within .halo {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+@media (hover: hover) {
+  .suspects > li .halo {
+    opacity: 0.62;
+  }
 }
 
 .card .fig {
@@ -855,5 +944,240 @@ a.logo:hover {
   .chalk .draw {
     animation: none;
     stroke-dashoffset: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Capa de movimiento
+
+   Todo lo de aca abajo lo enciende `Motion.tsx`. Tres reglas que no se
+   rompen: sin JavaScript la pagina se ve entera igual (nada nace invisible a
+   menos que `data-js` este puesto, y eso lo pone un script antes de pintar);
+   solo se animan `transform` y `opacity`; y con `prefers-reduced-motion` todo
+   esto queda en su estado final.
+   -------------------------------------------------------------------------- */
+
+/* Aparecer al entrar en pantalla. Sin `data-js` la regla no existe y el
+   contenido se ve desde el primer frame, que es lo que ve un buscador o
+   alguien con el JavaScript bloqueado. */
+[data-js] .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.65s var(--ease-out),
+    transform 0.65s var(--ease-out);
+}
+
+[data-js] .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Las fichas de sospechosos entran en cascada, de izquierda a derecha. */
+[data-js] .suspects.in > li {
+  animation: rise 0.55s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Barra de progreso: las cuatro franjas del flyer llenandose a lo ancho del
+   borde de arriba. Es la segunda y ultima vez que aparecen en la pagina. */
+.progress {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 15;
+  height: 3px;
+  pointer-events: none;
+}
+
+.progress-fill {
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(
+    90deg,
+    var(--teal) 0 25%,
+    var(--rosa) 0 50%,
+    var(--coral) 0 75%,
+    var(--mostaza) 0
+  );
+}
+
+/* Linterna. Quieta respira en el centro; con mouse persigue al cursor con
+   retraso (la clase `live` la pone Motion al primer movimiento). */
+.spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: min(120vw, 1100px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  transform: translate3d(50vw, 38vh, 0) translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(242, 232, 211, 0.085),
+    rgba(242, 232, 211, 0.03) 45%,
+    transparent 70%
+  );
+  animation: breathe 9s ease-in-out infinite;
+}
+
+.spotlight.live {
+  animation: none;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Riel de marcadores: aparece al pasar el hero y dice en que seccion estas.
+   Solo donde sobra ancho; en pantallas angostas la barra de entradas ya ocupa
+   el unico lugar fijo que conviene gastar. */
+.rail {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  z-index: 15;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  transform: translate(-16px, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+
+.rail.up {
+  opacity: 1;
+  transform: translate(0, -50%);
+  pointer-events: auto;
+}
+
+/* 1280 y no menos: el contenido va centrado a 1120px de ancho, asi que recien
+   ahi el margen libre es mas ancho que el riel y no se le monta encima. */
+@media (min-width: 1280px) {
+  .rail {
+    display: flex;
+  }
+}
+
+.rail .tent .n {
+  width: 34px;
+  height: 31px;
+  font-size: 0.95rem;
+  background: var(--chalk-50);
+  transition:
+    background-color 0.3s,
+    transform 0.3s var(--ease-out);
+}
+
+.rail .tent.on .n {
+  background: var(--c);
+  transform: translateY(-2px);
+}
+
+/* Titulo de seccion: el marcador se enciende cuando la seccion esta a la
+   vista, igual que su par del riel. */
+.section-head .tent .n {
+  background: var(--chalk-50);
+  transition: background-color 0.4s;
+}
+
+.section.seen .section-head .tent .n {
+  background: var(--accent, var(--chalk));
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Tira de estreno
+   -------------------------------------------------------------------------- */
+.ticker {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding-block: 16px;
+  border-block: 1px solid var(--line);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.ticker .track {
+  display: flex;
+  width: max-content;
+  animation: ticker 42s linear infinite;
+}
+
+.ticker:hover .track {
+  animation-play-state: paused;
+}
+
+.ticker .run {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.ticker .bit {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 48;
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+  white-space: nowrap;
+  color: var(--chalk-70);
+}
+
+.ticker .bit b {
+  font-family: var(--text);
+  font-size: 0.7em;
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Sin movimiento: todo en su estado final, nada en bucle
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-js] .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  [data-js] .suspects.in > li {
+    animation: none;
+  }
+
+  .spotlight,
+  .progress {
+    display: none;
+  }
+
+  .ticker .track {
+    animation: none;
+  }
+
+  .wm > * {
+    animation: none;
   }
 }

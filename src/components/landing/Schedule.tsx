@@ -29,7 +29,7 @@ export function Schedule({ phase }: { phase: SeasonPhase }) {
       <SectionHead n={3} title="La función" />
       <div className="split">
         <div>
-          <div className="hours">
+          <div className="hours reveal">
             {SEASON_DAYS.map((d) => {
               const h = hours(d.times);
               return (
@@ -65,7 +65,7 @@ export function Schedule({ phase }: { phase: SeasonPhase }) {
           )}
         </div>
 
-        <aside className="venue" aria-label="La sala">
+        <aside className="venue reveal" aria-label="La sala">
           <h3>{VENUE.name}</h3>
           <p className="addr">
             {VENUE.street}, {VENUE.neighborhood}
