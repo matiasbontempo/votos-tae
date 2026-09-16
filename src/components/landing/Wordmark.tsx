@@ -1,19 +1,33 @@
-import { closeSync, existsSync, openSync, readSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Image from "next/image";
 
 import { SHOW_TITLE } from "@/lib/constants";
+import { imageSize } from "@/lib/image-size";
 
 /**
  * El titulo de la obra en el hero.
  *
- * Si el lettering del flyer esta en `public/landing/wordmark.png`, se usa esa
- * imagen (con transparencia, es el LCP de la pagina y va precargada). Si el
- * archivo no esta, el titulo se compone con Fraunces a imitacion: tres
- * palabras, tres colores, sombra dura. Subir el archivo alcanza: no hay que
- * tocar codigo.
+ * Si el lettering del flyer esta en `public/landing/`, se usa ese archivo: es
+ * el LCP de la pagina, asi que va precargado y con sus medidas puestas, para
+ * que el texto de abajo no salte cuando termina de cargar. Si no esta, el
+ * titulo se compone con Fraunces a imitacion: tres palabras, tres colores,
+ * sombra dura. Subir el archivo alcanza; no hay que tocar codigo.
+ *
+ * Se aceptan varias extensiones a proposito. Antes solo miraba `wordmark.png`
+ * y cualquier otra cosa la ignoraba sin decir nada: quien exportaba un WebP
+ * desde Photoshop o un SVG desde Illustrator lo subia, no pasaba nada, y no
+ * habia forma de darse cuenta. El orden es de mejor a peor para un lettering
+ * con transparencia.
  */
-export const WORDMARK_FILE = "landing/wordmark.png";
+const CANDIDATES = [
+  "landing/wordmark.svg",
+  "landing/wordmark.png",
+  "landing/wordmark.webp",
+  "landing/wordmark.avif",
+  "landing/wordmark.jpg",
+  "landing/wordmark.jpeg",
+];
 
 export interface WordmarkAsset {
   src: string;
@@ -21,25 +35,18 @@ export interface WordmarkAsset {
   height: number;
 }
 
-/** Ruta y medidas del lettering, leidas del encabezado del PNG; null si falta. */
+/** Ruta y medidas del lettering, o null si todavia no lo subieron. */
 export function wordmarkAsset(): WordmarkAsset | null {
-  const path = join(process.cwd(), "public", WORDMARK_FILE);
-  if (!existsSync(path)) return null;
+  for (const name of CANDIDATES) {
+    const path = join(process.cwd(), "public", name);
+    if (!existsSync(path)) continue;
 
-  const header = Buffer.alloc(24);
-  const fd = openSync(path, "r");
-  try {
-    readSync(fd, header, 0, 24, 0);
-  } finally {
-    closeSync(fd);
+    const size = imageSize(path);
+    if (!size) continue;
+
+    return { src: `/${name}`, ...size };
   }
-  if (header.toString("ascii", 1, 4) !== "PNG") return null;
-
-  return {
-    src: `/${WORDMARK_FILE}`,
-    width: header.readUInt32BE(16),
-    height: header.readUInt32BE(20),
-  };
+  return null;
 }
 
 export function Wordmark() {
