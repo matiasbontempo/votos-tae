@@ -36,10 +36,38 @@ body {
 
 /* Telon de fondo: un degrade cálido apenas insinuado, como luz de escenario. */
 .stage-bg {
+  position: relative;
   background:
     radial-gradient(120% 80% at 50% -10%, rgba(201, 162, 39, 0.14), transparent 60%),
     radial-gradient(90% 60% at 50% 110%, rgba(122, 22, 46, 0.28), transparent 65%),
     var(--color-ink);
+}
+
+/* Grano de pelicula sobre el escenario. Sin el, los dos halos quedan demasiado
+   limpios: mas de app que de sala a oscuras.
+
+   Es un SVG inline con feTurbulence: no hay archivo ni request, y en el wifi
+   del teatro cada request cuenta. El tile es de 256 px a proposito: el filtro
+   se rasteriza una vez a ese tamaño y se repite, en vez de calcularse sobre
+   toda la pantalla de cada celular. El feColorMatrix lo pasa a gris: el ruido
+   fractal sale con color, y sobre fondo oscuro eso se lee como ruido digital,
+   no como grano.
+
+   pointer-events: none es obligatorio: queda encima de los botones de voto. */
+.stage-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+@media print {
+  .stage-bg::after {
+    display: none;
+  }
 }
 
 .font-display {
