@@ -418,7 +418,7 @@ a.tent:focus-visible .n {
    -------------------------------------------------------------------------- */
 .suspects {
   display: flex;
-  gap: 18px 14px;
+  gap: 22px 18px;
   margin: 0 calc(-1 * var(--gutter));
   padding: 4px var(--gutter) 8px;
   list-style: none;
@@ -438,6 +438,10 @@ a.tent:focus-visible .n {
 }
 
 
+/* Cuatro por fila y no siete, aunque los siete entren: a siete la ficha queda
+   de 148px y un identikit a lapiz a ese tamaño se vuelve una mancha. A cuatro
+   mide 270 y se le ve la cara, que es el mejor material que tiene la obra.
+   Siete es primo, asi que la segunda fila va de tres, centrada. */
 @media (min-width: 720px) {
   .suspects {
     flex-wrap: wrap;
@@ -449,21 +453,15 @@ a.tent:focus-visible .n {
   }
 
   .suspects > li {
-    flex-basis: calc((100% - 3 * 14px) / 4);
-  }
-}
-
-@media (min-width: 1100px) {
-  .suspects > li {
-    flex-basis: calc((100% - 6 * 14px) / 7);
+    flex-basis: calc((100% - 3 * 18px) / 4);
   }
 }
 
 .card {
   --c: var(--chalk);
   display: grid;
-  align-content: start;
   gap: 10px;
+  height: 100%;
   text-align: center;
 }
 
@@ -491,13 +489,7 @@ a.tent:focus-visible .n {
   inset: 8% 6% 0;
 }
 
-/* Dos lineas de alto siempre: "Cinthia Murdoch" y "Lawrence Caissings"
-   envuelven y los roles de toda la fila quedarian a distinta altura. */
 .card h3 {
-  display: flex;
-  align-items: start;
-  justify-content: center;
-  min-height: 2.2em;
   margin: 0;
   font-family: var(--display);
   font-weight: 600;
@@ -507,8 +499,11 @@ a.tent:focus-visible .n {
   text-wrap: balance;
 }
 
+/* El rol se apoya abajo de la ficha, no debajo del nombre: si un nombre se
+   parte en dos lineas, los roles de la fila siguen alineados entre si, y
+   cuando todos entran en una linea no queda ningun hueco reservado. */
 .card .role {
-  margin: 0;
+  margin: auto 0 0;
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.1em;
