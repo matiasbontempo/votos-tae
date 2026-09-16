@@ -182,7 +182,9 @@
 
 /* El lettering sube desde atras de su propia mascara, palabra por palabra. El
    padding de abajo le deja lugar a la panza de la "g" y a la sombra dura; el
-   margen negativo devuelve ese espacio para que las tres lineas no se abran. */
+   margen negativo devuelve ese espacio para que las tres lineas no se abran.
+   Esto es para el titulo compuesto, el de respaldo: son tres lineas y cada una
+   entra por separado. */
 .wm {
   display: block;
   overflow: hidden;
@@ -200,6 +202,27 @@
   from {
     transform: translateY(105%);
   }
+}
+
+/* El lettering de verdad NO entra animado, y es a proposito.
+   
+   Es la imagen mas grande de la pantalla, o sea el elemento que mide el
+   navegador para decir cuando la pagina "cargo" (LCP). Escondido detras de la
+   mascara casi un segundo, no cuenta como pintado: medido, el LCP en celular
+   pasaba de 108 ms a 2056 ms, y encima el elemento que terminaba contando era
+   un titulo de mas abajo. Dos segundos de diferencia por un gesto de un
+   segundo no es un intercambio que convenga.
+
+   Aparece de una, y todo lo demas del hero se acomoda alrededor. El titulo no
+   necesita hacer una entrada: es la entrada. */
+.wordmark:not(.wordmark-text) {
+  overflow: visible;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.wordmark:not(.wordmark-text) > * {
+  animation: none;
 }
 
 .hero .sub {
