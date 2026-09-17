@@ -11,9 +11,10 @@ import type { VariantProps } from "@/components/vote/variants/types";
  * Variante B · swipe horizontal, un sospechoso por pantalla.
  *
  * La mas teatral de las tres: cada personaje ocupa el celular entero, con su
- * color y su parrafo de acusacion. La seleccion sigue al scroll, asi que el
- * boton de abajo siempre apunta a quien estas mirando. Cuesta comparar a los
- * siete, pero para eso hay indicadores de posicion arriba.
+ * color, su nombre y el rol que ocupa en la casa. La seleccion sigue al
+ * scroll, asi que el boton de abajo siempre apunta a quien estas mirando.
+ * Cuesta comparar a los siete, pero para eso hay indicadores de posicion
+ * arriba.
  */
 export function SwipeVariant({
   options,
@@ -166,23 +167,18 @@ export function SwipeVariant({
                 <Identikit option={option} index={i} frame />
               </div>
 
-              <div className="mt-4 w-full max-w-sm shrink-0 text-center">
+              <div className="mt-5 w-full max-w-sm shrink-0 text-center">
                 {option.subtitle && (
                   <p
-                    className="text-[11px] font-semibold tracking-[0.2em] uppercase"
+                    className="text-xs font-semibold tracking-[0.18em] uppercase"
                     style={{ color: option.color }}
                   >
                     {option.subtitle}
                   </p>
                 )}
-                <h2 className="font-display mt-1.5 text-4xl leading-none">
+                <h2 className="font-display mt-2 text-[2.5rem] leading-[1.05] text-balance">
                   {option.name}
                 </h2>
-                {option.blurb && (
-                  <p className="text-muted mx-auto mt-3 max-w-xs text-sm leading-relaxed text-balance">
-                    {option.blurb}
-                  </p>
-                )}
                 {count !== undefined && (
                   <p className="text-muted mt-3 text-xs tabular-nums">
                     {count} {count === 1 ? "acusación" : "acusaciones"}

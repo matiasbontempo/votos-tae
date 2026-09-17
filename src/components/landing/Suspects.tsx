@@ -28,7 +28,6 @@ export function Suspects() {
             id: s.id,
             name: s.name,
             subtitle: s.role,
-            blurb: null,
             color: s.color,
             imageUrl: null,
             castId: null,

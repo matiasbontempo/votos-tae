@@ -11,8 +11,7 @@
 create table if not exists public.options (
   id          text primary key,          -- slug corto y estable: 'noah', 'maid', ...
   name        text not null,             -- nombre del personaje / final
-  subtitle    text,                      -- bajada corta, se ve en la tarjeta
-  blurb       text,                      -- parrafo de acusacion (variantes swipe/stack)
+  subtitle    text,                      -- el rol del personaje, debajo del nombre
   color       text not null default '#8b5cf6',  -- color de acento de la tarjeta
   image_url   text,                      -- foto/silueta recortada (PNG con alpha)
   sort_order  integer not null default 0
@@ -226,26 +225,26 @@ $$;
 -- ---------------------------------------------------------------------------
 -- 7. Los sospechosos de "Agravado por el Vinculo"
 -- ---------------------------------------------------------------------------
--- Los `blurb` son de relleno: cambiarlos por el texto real de la obra. Los `id`
--- conviene dejarlos fijos una vez que hubo funciones reales, porque los votos
--- los referencian.
+-- De cada sospechoso se ve el nombre y el rol que ocupa en la casa, nada mas:
+-- la acusacion se cuenta en escena, no en el celular. Los `id` conviene
+-- dejarlos fijos una vez que hubo funciones reales, porque los votos los
+-- referencian.
 --
--- El upsert pisa name/subtitle/blurb/color/sort_order en cada corrida, asi que
+-- El upsert pisa name/subtitle/color/sort_order en cada corrida, asi que
 -- este archivo es la fuente de verdad: si editas un personaje desde el Table
 -- Editor y despues volves a correr el schema, gana lo que dice aca. `image_url`
 -- queda afuera a proposito, para no borrar las fotos subidas a Storage.
-insert into public.options (id, name, subtitle, blurb, color, sort_order) values
-  ('noah',     'Noah Davies',        'Detective',             'Llego a la mansion antes de que nadie lo llamara, y conoce cada pasillo demasiado bien.',       '#3b82f6', 1),
-  ('maid',     'Lady Maid',          'Ama de llaves',         'Tiene la llave de todas las puertas y escucho todas las conversaciones.',                      '#10b981', 2),
-  ('liam',     'Liam Jones',         'Mano derecha de Emily', 'Manejaba cada negocio, cada deuda y cada secreto de Emily. Ser imprescindible tambien es un motivo.', '#f59e0b', 3),
-  ('james',    'James Smith',        '2do esposo de Emily',   'Entro a la familia por la puerta grande y todavia lo miran como a un extrano.',                '#8b5cf6', 4),
-  ('mary',     'Mary Caissings',     'Esposa de John',        'Se caso con el apellido y aprendio a soportar lo que venia con el. Esa noche dejo de sonreir.', '#e11d48', 5),
-  ('cinthia',  'Cinthia Murdoch',    'Protegida de Emily',    'Emily la levanto de la nada y la sento en una mesa donde nadie la queria.',                     '#22d3ee', 6),
-  ('lawrence', 'Lawrence Caissings', 'Hijo menor de Emily',   'Siempre segundo, siempre despues. Espero su turno toda la vida.',                              '#f472b6', 7)
+insert into public.options (id, name, subtitle, color, sort_order) values
+  ('noah',     'Noah Davies',        'Detective',             '#3b82f6', 1),
+  ('maid',     'Lady Maid',          'Ama de llaves',         '#10b981', 2),
+  ('liam',     'Liam Jones',         'Mano derecha de Emily', '#f59e0b', 3),
+  ('james',    'James Smith',        '2do esposo de Emily',   '#8b5cf6', 4),
+  ('mary',     'Mary Caissings',     'Esposa de John',        '#e11d48', 5),
+  ('cinthia',  'Cinthia Murdoch',    'Protegida de Emily',    '#22d3ee', 6),
+  ('lawrence', 'Lawrence Caissings', 'Hijo menor de Emily',   '#f472b6', 7)
 on conflict (id) do update set
   name       = excluded.name,
   subtitle   = excluded.subtitle,
-  blurb      = excluded.blurb,
   color      = excluded.color,
   sort_order = excluded.sort_order;
 
@@ -282,6 +281,14 @@ update public.shows
 -- defecto", que es lo que esas funciones tuvieron.
 alter table public.shows
   add column if not exists casting jsonb not null default '{}'::jsonb;
+
+-- La pantalla de votacion mostraba un parrafo de acusacion debajo del nombre y
+-- se saco: en la butaca se ve el nombre y el rol, y la acusacion se cuenta en
+-- escena. La columna `blurb` no la lee nadie mas, asi que se va. Era texto de
+-- relleno; si en esa base habia algo escrito a mano, guardalo antes de correr
+-- esto.
+alter table public.options
+  drop column if exists blurb;
 
 -- Las filas de conteo se siembran con un trigger al CREAR la funcion, asi que
 -- una funcion que ya existia no tiene fila para los sospechosos nuevos. Sin

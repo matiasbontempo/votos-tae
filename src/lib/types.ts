@@ -30,7 +30,6 @@ export interface VoteOption {
   id: string;
   name: string;
   subtitle: string | null;
-  blurb: string | null;
   color: string;
   /** Identikit ya resuelto para la funcion actual (ver `applyCasting`). */
   imageUrl: string | null;

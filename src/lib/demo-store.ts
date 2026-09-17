@@ -29,8 +29,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "noah",
     name: "Noah Davies",
     subtitle: "Detective",
-    blurb:
-      "Llegó a la mansión antes de que nadie lo llamara, y conoce cada pasillo demasiado bien. ¿Quién investiga al que investiga?",
     color: "#3b82f6",
     imageUrl: null,
     castId: null,
@@ -40,8 +38,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "maid",
     name: "Lady Maid",
     subtitle: "Ama de llaves",
-    blurb:
-      "Tiene la llave de todas las puertas y escuchó todas las conversaciones. Nadie mira a quien sirve el té.",
     color: "#10b981",
     imageUrl: null,
     castId: null,
@@ -51,8 +47,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "liam",
     name: "Liam Jones",
     subtitle: "Mano derecha de Emily",
-    blurb:
-      "Manejaba cada negocio, cada deuda y cada secreto de Emily. Ser imprescindible también es un motivo.",
     color: "#f59e0b",
     imageUrl: null,
     castId: null,
@@ -62,8 +56,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "james",
     name: "James Smith",
     subtitle: "2do esposo de Emily",
-    blurb:
-      "Entró a la familia por la puerta grande y todavía lo miran como a un extraño. Tenía todo por ganar y nada que perder.",
     color: "#8b5cf6",
     imageUrl: null,
     castId: null,
@@ -73,8 +65,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "mary",
     name: "Mary Caissings",
     subtitle: "Esposa de John",
-    blurb:
-      "Se casó con el apellido y aprendió a soportar lo que venía con él. Esa noche dejó de sonreír.",
     color: "#e11d48",
     imageUrl: null,
     castId: null,
@@ -84,8 +74,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "cinthia",
     name: "Cinthia Murdoch",
     subtitle: "Protegida de Emily",
-    blurb:
-      "Emily la levantó de la nada y la sentó en una mesa donde nadie la quería. La gratitud también tiene fecha de vencimiento.",
     color: "#22d3ee",
     imageUrl: null,
     castId: null,
@@ -95,8 +83,6 @@ export const DEMO_OPTIONS: VoteOption[] = [
     id: "lawrence",
     name: "Lawrence Caissings",
     subtitle: "Hijo menor de Emily",
-    blurb:
-      "Siempre segundo, siempre después. Esperó su turno toda la vida y esa noche se le acabó la paciencia.",
     color: "#f472b6",
     imageUrl: null,
     castId: null,

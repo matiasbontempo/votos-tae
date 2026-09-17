@@ -51,25 +51,20 @@ export function StackVariant({
               <Identikit option={option} index={i} frame />
             </div>
 
-            <div className="mt-4 w-full max-w-sm shrink-0 text-center">
+            <div className="mt-5 w-full max-w-sm shrink-0 text-center">
               {option.subtitle && (
                 <p
-                  className="text-[11px] font-semibold tracking-[0.2em] uppercase"
+                  className="text-xs font-semibold tracking-[0.18em] uppercase"
                   style={{ color: option.color }}
                 >
                   {option.subtitle}
                 </p>
               )}
-              <h2 className="font-display mt-1.5 text-4xl leading-none">
+              <h2 className="font-display mt-2 text-[2.5rem] leading-[1.05] text-balance">
                 {option.name}
               </h2>
-              {option.blurb && (
-                <p className="text-muted mx-auto mt-3 max-w-xs text-sm leading-relaxed text-balance">
-                  {option.blurb}
-                </p>
-              )}
               {count !== undefined && (
-                <p className="text-muted mt-2 text-xs tabular-nums">
+                <p className="text-muted mt-3 text-xs tabular-nums">
                   {count} {count === 1 ? "acusación" : "acusaciones"}
                 </p>
               )}
@@ -79,7 +74,7 @@ export function StackVariant({
                 disabled={submitting}
                 onClick={() => (isArmed ? onConfirm(option.id) : onSelect(option.id))}
                 onBlur={() => isArmed && onSelect(null)}
-                className="mt-5 flex h-14 w-full items-center justify-center rounded-full text-base font-semibold tracking-wide transition-all duration-300"
+                className="mt-6 flex h-14 w-full items-center justify-center rounded-full text-base font-semibold tracking-wide transition-all duration-300"
                 style={{
                   backgroundColor: isArmed ? option.color : "transparent",
                   color: isArmed ? "#0b0a0f" : option.color,

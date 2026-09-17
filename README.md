@@ -17,9 +17,10 @@ Los sospechosos:
 | 7 | Lawrence Caissings | Hijo menor de Emily |
 
 El título vive en `src/lib/constants.ts` (`SHOW_TITLE`) y los personajes al
-final de `supabase/schema.sql`. Los párrafos de acusación de cada uno son de
-relleno: reemplazalos por el texto real de la obra. Quién interpreta a cada uno
-(y con qué identikit) vive en `src/lib/cast.ts`; ver «Identikits y elenco».
+final de `supabase/schema.sql`. De cada uno se ve el nombre y el rol que ocupa
+en la casa, nada más: la acusación se cuenta en escena, no en el celular. Quién
+interpreta a cada uno (y con qué identikit) vive en `src/lib/cast.ts`; ver
+«Identikits y elenco».
 
 Tres pantallas:
 
@@ -90,7 +91,7 @@ La variante por defecto se fija con `NEXT_PUBLIC_DEFAULT_VOTE_UI`.
    panel, o finalizá esa función) y volvé a correr el archivo.
 3. Los siete sospechosos ya están cargados al final de `schema.sql`, en el
    `insert into public.options`. Ese insert es un upsert: si volvés a correr el
-   archivo, pisa nombre, bajada, párrafo, color y orden con lo que diga el
+   archivo, pisa nombre, rol, color y orden con lo que diga el
    archivo (`image_url` no se toca, así que las fotos sobreviven). Para un
    retoque rápido sirve **Table Editor → options**, pero lo que dure conviene
    escribirlo en `schema.sql`. Los `id` conviene no tocarlos una vez que hubo

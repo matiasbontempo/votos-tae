@@ -21,7 +21,6 @@ interface OptionRow {
   id: string;
   name: string;
   subtitle: string | null;
-  blurb: string | null;
   color: string;
   image_url: string | null;
   sort_order: number;
@@ -49,7 +48,6 @@ export function mapOption(row: OptionRow): VoteOption {
     id: row.id,
     name: row.name,
     subtitle: row.subtitle,
-    blurb: row.blurb,
     color: row.color,
     imageUrl: row.image_url,
     castId: null,
