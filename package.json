@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "identikits": "node scripts/identikits.mjs"
+    "identikits": "node scripts/identikits.mjs",
+    "contorno": "node scripts/contorno.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
