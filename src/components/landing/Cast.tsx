@@ -6,7 +6,7 @@ import { CAST, CREDITS, FRAME_LINE, TAE_BLURB, VENUE } from "@/lib/landing-conte
 export function Cast() {
   return (
     <section className="section wrap" id="elenco" style={{ "--accent": "var(--mostaza)" } as CSSProperties}>
-      <SectionHead title="Elenco y equipo" />
+      <SectionHead n={3} title="Elenco y equipo" />
       <p className="tae reveal">{TAE_BLURB}</p>
       <p className="frame">
         {FRAME_LINE} Producción: {VENUE.fullName}.

@@ -205,14 +205,9 @@ export { identikitUrl };
  */
 export const SECTIONS = [
   { n: 1, id: "el-caso", label: "El caso", color: "var(--teal)" },
-  { n: 2, id: "sospechosos", label: "Los sospechosos", color: "var(--rosa)" },
-  { n: 3, id: "la-funcion", label: "La función", color: "var(--coral)" },
+  { n: 2, id: "la-funcion", label: "La función", color: "var(--coral)" },
+  { n: 3, id: "elenco", label: "Elenco y equipo", color: "var(--mostaza)" },
 ];
-
-export const SUSPECTS_TITLE = "Siete sospechosos. Una sola verdad.";
-
-export const SUSPECTS_CLOSE =
-  "Las acusaciones se leen en la sala. Vos vas a señalar a uno desde tu butaca.";
 
 // ---------------------------------------------------------------------------
 // Elenco y equipo

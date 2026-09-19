@@ -26,7 +26,7 @@ export function Schedule({ phase }: { phase: SeasonPhase }) {
 
   return (
     <section className="section wrap" id="la-funcion" style={{ "--accent": "var(--coral)" } as CSSProperties}>
-      <SectionHead n={3} title="La función" />
+      <SectionHead n={2} title="La función" />
       <div className="split">
         <div>
           <div className="hours reveal">
