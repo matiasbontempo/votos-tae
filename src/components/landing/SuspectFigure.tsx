@@ -45,7 +45,7 @@ export function SuspectFigure({
         alt={`Identikit de ${option.name}`}
         fill
         className="identikit-fade"
-        style={{ objectFit: "contain", objectPosition: "bottom" }}
+        style={{ objectFit: "cover", objectPosition: "center" }}
         sizes="(min-width: 720px) 280px, 62vw"
         draggable={false}
       />

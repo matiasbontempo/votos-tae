@@ -51,8 +51,11 @@ for (const file of files) {
 
   const image = sharp(input)
     // Recorta el margen transparente sobrante: asi todos los identikits llegan
-    // al borde inferior del contenedor y se alinean entre si.
-    .trim()
+    // al borde inferior del contenedor y se alinean entre si. El threshold
+    // default (10) es demasiado sensible a un pixel suelto cerca de un borde
+    // (ruido de exportacion): recorta ese lado casi nada y el otro entero,
+    // y el dibujo termina descentrado aunque el original no lo este.
+    .trim({ threshold: 50 })
     .resize({ width: IDENTIKIT_WIDTH, withoutEnlargement: true })
     .webp({ quality: 82, alphaQuality: 90, effort: 6 });
 
