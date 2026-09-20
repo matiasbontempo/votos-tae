@@ -72,8 +72,7 @@ export function canSeeResults(
   show: Pick<Show, "status" | "resultsVisibility">,
   hasVoted: boolean,
 ): boolean {
-  // Cerrada o finalizada: el resultado ya es publico, no hay nada que proteger.
-  if (show.status === "closed" || show.status === "finished") return true;
+  // Cerrada o finalizada: el publico no ve el desglose de votos, nunca.
   if (show.status !== "open") return false;
 
   switch (show.resultsVisibility) {

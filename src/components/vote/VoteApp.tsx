@@ -212,31 +212,11 @@ export function VoteApp({
   }
 
   if (show.status === "closed") {
-    const winner = pickWinner(state);
     return (
       <Screen
-        title={winner ? `El jurado eligió a ${winner.name}` : "Votación cerrada"}
-        body={
-          winner
-            ? "Volvé a mirar el escenario."
-            : "Se cerró la votación. Volvé a mirar el escenario."
-        }
-      >
-        {tallies && total !== null && (
-          <div className="mt-8 w-full">
-            <ResultsBars
-              options={options}
-              tallies={tallies}
-              total={total}
-              myVote={myVote}
-              winnerId={show.winnerOptionId ?? winner?.id ?? null}
-            />
-            <p className="text-muted mt-4 text-center text-xs">
-              {total} {total === 1 ? "voto" : "votos"} en total
-            </p>
-          </div>
-        )}
-      </Screen>
+        title="Votación cerrada"
+        body="Se cerró la votación. Volvé a mirar el escenario."
+      />
     );
   }
 
@@ -336,23 +316,6 @@ function withOptimisticVote(prev: PublicState, optionId: string): PublicState {
   );
 
   return { ...prev, myVote: optionId, tallies, total: prev.total + 1 };
-}
-
-/** La opcion mas votada, o null si hay empate o no hay votos. */
-function pickWinner(state: PublicState) {
-  const { options, tallies, show } = state;
-
-  if (show?.winnerOptionId) {
-    return options.find((o) => o.id === show.winnerOptionId) ?? null;
-  }
-  if (!tallies) return null;
-
-  const sorted = [...tallies].sort((a, b) => b.count - a.count);
-  const top = sorted[0];
-  if (!top || top.count === 0) return null;
-  if (sorted[1] && sorted[1].count === top.count) return null; // empate
-
-  return options.find((o) => o.id === top.optionId) ?? null;
 }
 
 function Screen({
