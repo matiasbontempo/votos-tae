@@ -36,8 +36,8 @@ export const CHARACTERS: Record<string, Character> = {
   },
   maid: {
     cast: [
-      { id: "a", label: "Elenco A", identikit: "maid-a.webp" },
-      { id: "b", label: "Elenco B", identikit: "maid-b.webp" },
+      { id: "a", label: "Valenchu", identikit: "maid-a.webp" },
+      { id: "b", label: "Pola", identikit: "maid-b.webp" },
     ],
   },
   liam: {
@@ -48,8 +48,8 @@ export const CHARACTERS: Record<string, Character> = {
   },
   mary: {
     cast: [
-      { id: "a", label: "Elenco A", identikit: "mary-a.webp" },
-      { id: "b", label: "Elenco B", identikit: "mary-b.webp" },
+      { id: "a", label: "Male", identikit: "mary-a.webp" },
+      { id: "b", label: "Valenchu", identikit: "mary-b.webp" },
     ],
   },
   cinthia: {

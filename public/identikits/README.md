@@ -6,10 +6,10 @@ nombres de archivo los fija `src/lib/cast.ts` (campo `identikit` de cada actor):
 | Archivo | Personaje |
 | --- | --- |
 | `noah.webp` | Noah Davies |
-| `maid-a.webp` / `maid-b.webp` | Lady Maid, según el elenco de la función |
+| `maid-a.webp` / `maid-b.webp` | Lady Maid: A es Valenchu, B es Pola |
 | `liam.webp` | Liam Jones |
 | `james.webp` | James Smith |
-| `mary-a.webp` / `mary-b.webp` | Mary Caissings, según el elenco de la función |
+| `mary-a.webp` / `mary-b.webp` | Mary Caissings: A es Male, B es Valenchu |
 | `cinthia.webp` | Cinthia Murdoch |
 | `lawrence.webp` | Lawrence Caissings |
 
